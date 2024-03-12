@@ -19,7 +19,7 @@ p{
     font-size: 40px;
     line-height: 50px;
     text-align: center;
-    color: #B6B0DD;
+    color: #333333;
     text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 }
 
@@ -32,18 +32,21 @@ img{
 }
 
 
+
 .button-style {
     position: absolute;
     width: 399px;
     height: 110px;
-    left: calc(50% - 399px/2);
+    left: calc(50% - 400px/2);
     top: 610px;
     background: #00D1FF;
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.458); 
+    border: none;
     border-radius: 20px;
     display: flex;
-    justify-content: center; 
+    justify-content: center;
     align-items: center;
+    cursor: pointer;
 }
 
 .block-text {
@@ -54,8 +57,49 @@ img{
     line-height: 45px;
     text-align: center;
     color: #FFFFFF;
-    text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.556);
 }
+
+.button-style:hover {
+    background: #00D1FF; /* Change background color on hover */
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25); /* Change box shadow on hover */
+}
+
+
+.button-style:hover,
+.login-button:hover,
+.register-button:hover{
+    background: #005A8C; /* Change background color on hover */
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25); /* Change box shadow on hover */
+}
+
+.navbar {
+    padding: 30px;
+    text-align: right;
+    display: flex;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+
+.login-button,
+.register-button {
+    background: #00D1FF;
+    text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.556);
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.458); 
+    color: #ffffff;
+    border: none;
+    margin: 5px;
+    padding: 15px 20px; 
+    width: 200px; 
+    cursor: pointer;
+    border-radius: 8px;
+    font-family: 'Lexend', sans-serif; 
+    font-size: 20px;
+    line-height: 1; 
+}
+
 
 
 
