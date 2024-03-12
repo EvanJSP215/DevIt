@@ -1,9 +1,11 @@
-from flask import Flask
+from flask import Flask, render_template
 
 app = Flask(__name__)
 
-#@app.route("/")
-#TODO: Landing Page
+@app.route("/")
+def landing_page():
+    #TODO: Landing Page Function
+    return render_template("landingPage.html")
 
 #@app.route("/register")
 #TODO: Register
