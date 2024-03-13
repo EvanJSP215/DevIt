@@ -2,3 +2,4 @@ pymongo
 bcrypt
 requests
 flask
+Flask-WTF

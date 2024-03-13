@@ -1,29 +1,50 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
-    <title>Landing Page</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/register.css') }}">
+    <title>Register</title>
+    <link rel="icon" href= "{{ url_for('static', filename='images/logo.png') }}">
 </head>
-<body>
 
-    <div class="navbar">
-        <div class="navbar">
-            <form action="/register" method="get" enctype="application/x-www-form-urlencoded">
-                <button type="submit" class="register-button">Register</button>
-            </form>
-            <form action="/login" method="get" enctype="application/x-www-form-urlencoded">
-                <button type="submit" class="login-button">Login</button>
-            </form>
-        </div>
-    </div>
 
-    <img src="{{ url_for('static', filename='images/image.png') }}" alt="Blog Image">
-    <p>Create your unique and stunning blog easily.</p>
-    <a href = "blog.html" target="_blank">
-        <button class="button-style">
-            <span class="block-text">Create your Blog</span>
-        </button>
-    </a>
-</body>
+
+  <body>
+    <div class = 'registerform'>
+      <h1 class ='Regwelcome'>Welcome to TBD</h1>
+      <div id="regfailed" class = 'failmsg' style="color: red;">
+        {{ Failmessage|default('') }}
+      </div>
+      <form action="/register" method="post" enctype='application/x-www-form-urlencoded' onsubmit="return regcheck()">
+          <input type="email" id="reg_email" name="reg_email" required placeholder="Email"/>
+          <br />
+          <input id="reg-pass" type="password" name="reg_pass" required placeholder="Password" oninput="pwstrengthcheck()"/>        <br />
+          <div id="pwstrength" style="display: none;" class="verify">
+            <input type="checkbox" id="uppercase"  disabled/> 
+            <label for="uppercase">At least one uppercase letter</label><br />
+            <input type="checkbox" id="lowercase"  disabled/>
+            <label for="lowercase"> At least one lowercase letter</label><br />
+            <input type="checkbox" id="numbers"  disabled/> 
+            <label for="numbers">At least one number</label><br />
+            <input type="checkbox" id="specials"  disabled/>
+            <label for="specials"> At least one special character</label><br />
+            <input type="checkbox" id="length"  disabled/> 
+            <label for="length">Minimum length of 8 characters</label><br />
+          </div>
+          <input id="reg-cpass" type="password" name="reg_cpass" required required placeholder="Confirm Password"/>
+          <br />
+          <input type="submit" id = 'reg_submit' value="Register">
+          <div class="or-container">
+            <span className="or-text">OR</span>
+          </div>
+          <br />
+          <div class ='have_acc'>
+            <span class="haccount">Already have an account? <a href="/login" class="login-link">Login here</a></span>
+          </div>
+      </form>
+      </div>
+      <div class="vertical-line"></div>
+  </body>
+  
+  <script src="{{ url_for('static', filename='function/function.js') }}"></script> 
 
 </html>
