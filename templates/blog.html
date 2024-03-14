@@ -1,12 +1,55 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Blog page</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/blog.css') }}">
+    <title>Blog</title>
 </head>
+
 <body>
+    <div class="head-container">
+        <div class="left-content">
+            TBD
+            <!-- <link rel="icon" href= "{{ url_for('static', filename='images/logo.png') }}"> -->
+        </div>
+        <div class="right-content">
+            <button class = "logout-button"> logout </button>
+        </div>
+    </div>
 
-<h1>This is a Blog Page needs to be implemented later</h1>
-<p>This is a paragraph.</p>
+    <!-- this is the user information that is displayed on the left side -->
+    <div class = "content-container">
+        <div class="user-info-container">
+            <div class="display-Username">{{Username}}</div>
+            <div class="counters">
+                <span>Following: {{following count}}</span>
+                <span>Followers: {{follower count}}</span>
+                <span>Posts: {{post count}}</span>
+            </div>
+        </div>
 
+        <!-- this is the where you post blog/images -->
+        <div class="chat-container">
+            <div class="post">
+                <input class = post-input type="text" placeholder="want to share something? Type it here">
+            </br>
+                <button class="Upload-button">Upload</button>
+                <button class="publish-button">Publish</button>
+            </div>
+            
+            <!-- this is the display part -->
+            <div class="published-post">
+                <div class="username">{{PostUsername}}</div>
+                <div class="content">TEXT/ BLOG POST/ IMAGES</div>
+
+                <div class="icons">
+                    <label>
+                        <button class="like-button">👍</button> ({{like count}})
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
