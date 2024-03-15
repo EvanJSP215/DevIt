@@ -70,7 +70,8 @@ body {
     background-color: white;
     margin-left: -200px;
     width: 700px;
-    height: 100px;
+    height: 200px;
+
 }
 .username {
     font-weight: bold;
@@ -93,7 +94,8 @@ body {
     border-right-width: 0px;
     border-left-style: solid;
     border-left-width: 0px;
-    height: 23px;
+    height: 132px; width: 685px;
+    resize: none;
 }
 .Upload-button{
     background-color: #007bff;
@@ -105,7 +107,7 @@ body {
     font-weight: bold;
     margin-top: 30px;
     align-self: flex-start;
-    margin-left: 540px;
+    margin-left: 540px;;
 }
 .publish-button {
     background-color: #007bff;
@@ -123,6 +125,8 @@ body {
     justify-content: space-between;
     margin-top: 20px;
     padding-top: 40px;
+    font-size: 12px;
+    line-height: 2;
 }
 .counters span {
     font-weight: bold;
