@@ -1,5 +1,8 @@
 from flask import Flask, render_template, request, send_from_directory, jsonify, make_response, flash
 from pymongo import MongoClient
+from flask import session
+from itsdangerous import URLSafeTimedSerializer
+import datetime
 import bcrypt
 import secrets
 import hashlib
@@ -11,6 +14,7 @@ app = Flask(__name__)
 mongo_client = MongoClient("mongo")
 db = mongo_client["TBD"]
 auth = db['auth']
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 
 @app.route("/")
 def landing_page():
@@ -91,6 +95,32 @@ def register():
         response.headers["Content-Type"] = "text/html"
         return response
     
+
+    
+
+def generate_auth_token(user_id, expiration=3600):
+    s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+    token = s.dumps({'user_id': str(user_id)})
+    return token
+
+@app.route("/login", methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form.get('login_email').lower()
+        password = request.form.get('login_pass')
+        user = auth.find_one({'email': email})
+
+        if user and bcrypt.checkpw(password.encode(), user['password']):
+            token = generate_auth_token(user['_id'])
+            token_hash = hashlib.sha256(token.encode()).hexdigest()
+            auth.update_one({'_id': user['_id']}, {'$set': {'token_hash': token_hash}})
+            return render_template('blog.html')
+        else:
+            flash('Invalid email or password', 'error') 
+            return render_template('login.html')
+
+    else:
+        return render_template('login.html')
 
 
 
