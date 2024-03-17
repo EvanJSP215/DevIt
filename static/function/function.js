@@ -94,42 +94,6 @@ function regcheck(){
     }
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    const loginForm = document.getElementById('loginForm');
-
-    loginForm.addEventListener('submit', function(event) {
-        event.preventDefault();
-        const email = document.getElementById('login_email').value;
-        const password = document.getElementById('login-pass').value;
-        const loginFailedDiv = document.getElementById('loginfailed');
-
-        fetch('/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `login_email=${encodeURIComponent(email)}&login_pass=${encodeURIComponent(password)}`
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Login failed');
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                loginFailedDiv.style.display = "none";
-                window.location.href = "/blog"; // Redirect to the blog page
-            } else {
-                loginFailedDiv.textContent = data.error || 'Invalid email or password';
-                loginFailedDiv.style.display = "block";
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            loginFailedDiv.textContent = 'Login failed. Please try again.';
-            loginFailedDiv.style.display = "block";
-        });
-    });
-});
 
 
 
