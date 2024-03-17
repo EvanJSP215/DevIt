@@ -5,20 +5,17 @@
     <title>Login</title>
     <link rel="icon" href="{{ url_for('static', filename='images/TBD-modify.png') }}">
 </head>
-
 <body>
     <div class='registerform'>
         <h1 class='Regwelcome'>Welcome Back</h1>
-        <div id="loginfailed" class='failmsg' style="color: red;"></div>
-        <form id="loginForm" action="javascript:void(0);" method="post" enctype='application/x-www-form-urlencoded'>
+        <div id="loginfailed" class='failmsg' style="color: red;">{{ loginFailMessage|default('') }}</div>
+        <form action="/login" method="post" enctype='application/x-www-form-urlencoded'>
             <input type="email" id="login_email" name="login_email" required placeholder="Email"/>
             <br />
             <input id="login-pass" type="password" name="login_pass" required placeholder="Password"/>
             <br />
             <input type="submit" id='login_submit' value="Log In">
         </form>
-        <!-- Logout button, hidden by default -->
-        <button id="logoutButton" style="display:none;">Logout</button>
         <div class="or-container">
             <span class="or-text">OR</span>
         </div>
@@ -28,8 +25,5 @@
         </div>
     </div>
     <div class="vertical-line"></div>
-    <!-- User display area, hidden by default -->
-    <div id="userDisplayArea" style="display: none;"></div>
-    <script src="{{ url_for('static', filename='function/function.js') }}"></script>
 </body>
 </html>
