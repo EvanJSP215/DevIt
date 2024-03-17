@@ -85,7 +85,7 @@ def register():
         user = {"email": email,'password': hashedpw,'csrf':csrf}
         auth.insert_one(user)
         check = auth.find_one({'email': email})
-        body = render_template("register.html")
+        body = render_template("login.html")
         response = make_response(body)
         response.headers["Content-Type"] = "text/html"
         response.headers['X-Content-Type-Options'] = 'nosniff'
@@ -113,17 +113,35 @@ def login():
             auth.update_one({'email': email}, {'$set': {'token_hash': token_hash}})
 
             # change the url for blog page
-            resp = make_response(redirect(url_for('blog_page')))
+            body = render_template('blog.html')
+            resp = make_response(body)
+            resp.headers["Content-Type"] = "text/html"
+            resp.headers['X-Content-Type-Options'] = 'nosniff'
             resp.set_cookie('auth_token', base64.b64encode(token).decode('utf-8'), httponly=True, expires=(datetime.now() + timedelta(hours=1)))
-
             return resp
         else:
             # Authentication failed
             loginFailMessage = "Invalid email or password. Please try again."
-            return render_template('login.html', loginFailMessage=loginFailMessage)
-
-    return render_template('login.html')
+            body = render_template('login.html', loginFailMessage=loginFailMessage)
+            response = make_response(body)
+            response.headers["Content-Type"] = "text/html"
+            response.headers['X-Content-Type-Options'] = 'nosniff'
+            return response
     
+    body = render_template('login.html')
+    response = make_response(body)
+    response.headers["Content-Type"] = "text/html"
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    return response
+
+
+@app.route('/blogPage', methods=['GET'])
+def blogPage():
+    body = render_template('blog.html')
+    response = make_response(body)
+    response.headers["Content-Type"] = "text/html"
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    return response
 
 
 

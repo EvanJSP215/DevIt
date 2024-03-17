@@ -18,13 +18,15 @@
         </div>
     </div>
 
-    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Blog Image">
-    <p>Create your unique and stunning blog easily.</p>
-    <a href = "blog.html" target="_blank">
-        <button class="button-style">
+    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Blog Image" id="GoBlog">
+    <p>Create your unique and stunning blog easily</p>
+    <form action="/blogPage" method="get" enctype="application/x-www-form-urlencoded" onsubmit="return blogConfirm()">
+        <button type="submit" class="button-style">
             <span class="block-text">Create your Blog</span>
         </button>
-    </a>
+    </form>
 </body>
+
+<script src="{{ url_for('static', filename='function/function.js') }}"></script> 
 
 </html>

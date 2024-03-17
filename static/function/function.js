@@ -94,6 +94,9 @@ function regcheck(){
     }
 }
 
+function blogConfirm(){
+}
+
 
 
 

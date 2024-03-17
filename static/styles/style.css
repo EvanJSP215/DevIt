@@ -19,7 +19,7 @@ p{
     line-height: 50px;
     text-align: center;
     font-family: 'Manrope', sans-serif;
-    color: #848CA0;
+    color: #6420AA;
     box-sizing: border-box;
     text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.25);
 }
@@ -52,7 +52,7 @@ img{
 }
 
 .block-text {
-    font-family: 'Lexend';
+    font-family: 'Manrope', sans-serif;
     font-style: normal;
     font-weight: 400;
     font-size: 36px;
