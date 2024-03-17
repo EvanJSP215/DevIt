@@ -1,0 +1,139 @@
+.Regwelcome {
+    font-family: 'Manrope', sans-serif;
+    font-size: 50px;
+    font-weight: bold; 
+    color: #848CA0;
+    text-align: center;
+    margin-bottom: 20px;
+    width: 100%;
+    box-sizing: border-box;
+    text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
+    -webkit-text-stroke: 1px #ffffff; 
+    margin-left: 11%;
+  }
+  
+  .failmsg{
+    font-family: 'Manrope', sans-serif;
+    text-align: center;
+    margin-bottom: 20px;
+    width: 100%;
+    margin-left: 11%;
+    font-weight: bold; 
+  }
+  
+  form {
+    padding: 10px;
+    border-radius: 15px;
+    text-align: center; 
+  }
+  
+  input {
+    width: 130%;
+    height: 50px;
+    padding: 10px;
+    margin-bottom: 25px; 
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 15px;
+  }
+  
+  input::placeholder {
+    font-family: 'Manrope', sans-serif;
+  }
+  
+  input[type="submit"] {
+    background-color: #A1A1BA;
+    color: white;
+    cursor: pointer;
+  }
+  
+  input[type="submit"]:hover {
+    background-color: #6F6F8B; 
+  }
+  
+  body {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    height: 80vh;
+    margin: 0;
+  }
+  
+  .registerform {
+    max-width: 550px;
+    margin-right: 20%;
+  }
+  
+  .or-container {
+    display: flex;
+    align-items: center;
+    margin-left: 28%;
+    white-space: pre-line;
+    font-family: 'Manrope', sans-serif;
+  }
+  
+  .or-container:before,
+  .or-container:after {
+    content: "";
+    display: block;
+    height: 1px;
+    width: 90%; 
+    background: #090909; 
+    margin: 0 10px;
+  }
+  
+  .have_acc{
+    display: flex;
+    align-items: center;
+    margin-left: 31%;
+    font-family: 'Manrope', sans-serif;
+    font-size: 15px;
+  }
+  
+  .haccount{
+    color:#373434;
+  }
+  
+  .login-link {
+      color: #94a6d3; 
+  }
+  
+  .vertical-line {
+    position: absolute;
+    left: 50%;
+    top: 10%;
+    bottom: 10%;
+    width: 8px; 
+    background-color: #595560;
+    content: "";
+    margin-left: -10px; 
+  }
+  
+  body {
+    background: linear-gradient(to right, #A5AFE5, #ffffff); 
+  }
+  
+  .verify{
+    text-align: left;
+  }
+  
+  input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    border: 1px solid #ccc;
+    vertical-align: -3px;
+    margin-right: 5px; 
+  }
+  
+  
+  .verify label {
+    font-size: 14px;
+    color: #333;
+    vertical-align: middle;
+    font-family: 'Manrope', sans-serif;
+  }
+
+
+
+
+
