@@ -84,11 +84,13 @@ def register():
         body = render_template("register.html")
         response = make_response(body)
         response.headers["Content-Type"] = "text/html"
+        response.headers['X-Content-Type-Options'] = 'nosniff'
         return response
     else:
         body = render_template("register.html")
         response = make_response(body)
         response.headers["Content-Type"] = "text/html"
+        response.headers['X-Content-Type-Options'] = 'nosniff'
         return response
     
 
