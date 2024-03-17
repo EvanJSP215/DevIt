@@ -31,21 +31,29 @@
 
         <!-- this is the where you post blog/images -->
         <div class="chat-container">
-            <div class="post">
-                <textarea class = post-input type="text" placeholder="want to share something? Type it here"></textarea>
-            </br>
-                <button class="Upload-button">Upload</button>
-                <button class="publish-button">Publish</button>
-            </div>
+            <form action="/chatform" method="post" enctype='application/x-www-form-urlencoded'>
+                <label>
+                    Chat:
+                </label>
+                <div class="post">
+                    <textarea class= post-input type="text" name="message" placeholder="want to share something? Type it here"></textarea>
+                    <input type="hidden" id="xsrfToken"  name="xsrfToken" value="{{xsrf}}">
+                </br>
+                    <button class="Upload-button">Upload</button>
+                    <button class="publish-button" type="submit">Publish</button>
+                </div>
+            </form>
             
             <!-- this is the display part -->
             <div class="published-post">
                 <div class="username">{{PostUsername}}</div>
                 <div class="content">TEXT/ BLOG POST/ IMAGES</div>
-
+                <div id = chatMessage>
+                     <!-- Chat messages will be displayed here -->
+                </div>
                 <div class="icons">
                     <label>
-                        <button class="like-button">👍 ({{ like_count }})</button>
+                        <button class="like-button">👍</button> ({{like count}})
                     </label>
                 </div>
             </div>

@@ -14,6 +14,7 @@ app = Flask(__name__)
 mongo_client = MongoClient("mongo")
 db = mongo_client["TBD"]
 auth = db['auth']
+chat = db['chat']
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 
 @app.route("/")
@@ -117,7 +118,7 @@ def login():
             resp = make_response(body)
             resp.headers["Content-Type"] = "text/html"
             resp.headers['X-Content-Type-Options'] = 'nosniff'
-            resp.set_cookie('auth_token', base64.b64encode(token).decode('utf-8'), httponly=True, expires=(datetime.now() + timedelta(hours=1)))
+            resp.set_cookie('auth_token', base64.b64encode(token).decode('utf-8'), httponly=True, max_age=3600)
             return resp
         else:
             # Authentication failed
@@ -135,8 +136,10 @@ def login():
     return response
 
 
-@app.route('/blogPage', methods=['GET'])
+@app.route('/blogPage', methods=['GET', 'POST'])
 def blogPage():
+    # if request.method == 'POST':
+        
     body = render_template('blog.html')
     response = make_response(body)
     response.headers["Content-Type"] = "text/html"
