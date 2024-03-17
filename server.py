@@ -14,6 +14,7 @@ app = Flask(__name__)
 mongo_client = MongoClient("mongo")
 db = mongo_client["TBD"]
 auth = db['auth']
+token = db['token']
 chat = db['chat']
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 
@@ -111,7 +112,12 @@ def login():
             token_hash = hashlib.sha256(token).hexdigest()
 
             # Store the hash of the token in the database
-            auth.update_one({'email': email}, {'$set': {'token_hash': token_hash}})
+            authentication = token.find_one({'email': email})
+            if (authentication):
+                token.update_one({'email': email}, {'$set': {'token_hash': token_hash}})
+            else:
+                auth_user = {"email": email,'token_hash': token_hash}
+                token.insert_one(auth_user)
 
             # change the url for blog page
             body = render_template('blog.html')
