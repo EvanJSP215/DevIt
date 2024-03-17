@@ -1,5 +1,8 @@
 from flask import Flask, render_template, request, send_from_directory, jsonify, make_response, flash
 from pymongo import MongoClient
+from flask import session
+from datetime import datetime, timedelta
+import datetime
 import bcrypt
 import secrets
 import hashlib
@@ -11,6 +14,7 @@ app = Flask(__name__)
 mongo_client = MongoClient("mongo")
 db = mongo_client["TBD"]
 auth = db['auth']
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 
 @app.route("/")
 def landing_page():
@@ -93,7 +97,33 @@ def register():
         response.headers['X-Content-Type-Options'] = 'nosniff'
         return response
     
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form['login_email']
+        password = request.form['login_pass'].encode('utf-8')
+        user = auth.find_one({'email': email})
 
+        if user and bcrypt.checkpw(password, user['password']):
+            # Generate a random token and its hash
+            token = os.urandom(24)
+            token_hash = hashlib.sha256(token).hexdigest()
+
+            # Store the hash of the token in the database
+            auth.update_one({'email': email}, {'$set': {'token_hash': token_hash}})
+
+            # change the url for blog page
+            resp = make_response(redirect(url_for('blog_page')))
+            resp.set_cookie('auth_token', base64.b64encode(token).decode('utf-8'), httponly=True, expires=(datetime.now() + timedelta(hours=1)))
+
+            return resp
+        else:
+            # Authentication failed
+            loginFailMessage = "Invalid email or password. Please try again."
+            return render_template('login.html', loginFailMessage=loginFailMessage)
+
+    return render_template('login.html')
+    
 
 
 
