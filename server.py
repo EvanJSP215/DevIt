@@ -17,12 +17,17 @@ auth = db['auth']
 chat = db['chat']
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 
+#add a nosniff after all responses
+@app.after_request
+def nosniff(response):
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    return response
+
 @app.route("/")
 def landing_page():
     body = render_template("landingPage.html")
     response = make_response(body)
     response.headers["Content-Type"] = "text/html"
-    response.headers['X-Content-Type-Options'] = 'nosniff'
     return response
 
 @app.route("/static/images/<filename>", methods=['GET'])
@@ -35,7 +40,6 @@ def handle_img(filename):
         response = make_response(send_from_directory(path, filename))
         response.headers["Content-Type"] = "image/png"
 
-    response.headers['X-Content-Type-Options'] = 'nosniff'
     return response
 
 @app.route('/static/styles/filename', methods=['GET'])
@@ -43,7 +47,6 @@ def handle_css(filename):
     body = render_template(filename)
     response = make_response(body)
     response.headers["Content-Type"] = "text/css"
-    response.headers['X-Content-Type-Options'] = 'nosniff'
     return response
 
 @app.route('/static/function/filename', methods=['GET'])
@@ -51,7 +54,6 @@ def handle_js(filename):
     body = render_template(filename)
     response = make_response(body)
     response.headers["Content-Type"] = "application/javascript"
-    response.headers['X-Content-Type-Options'] = 'nosniff'
     return response
 
 
@@ -69,7 +71,6 @@ def register():
             body = render_template('register.html', Failmessage=Failmessage )
             response = make_response(body,403)
             response.headers["Content-Type"] = "text/html"
-            response.headers['X-Content-Type-Options'] = 'nosniff'
             return response
         #if the email is already registered
         if check:
@@ -77,7 +78,6 @@ def register():
             body = render_template('register.html', Failmessage=Failmessage )
             response = make_response(body,403)
             response.headers["Content-Type"] = "text/html"
-            response.headers['X-Content-Type-Options'] = 'nosniff'
             return response
         email = email.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
         password = password.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
@@ -89,13 +89,11 @@ def register():
         body = render_template("login.html")
         response = make_response(body)
         response.headers["Content-Type"] = "text/html"
-        response.headers['X-Content-Type-Options'] = 'nosniff'
         return response
     else:
         body = render_template("register.html")
         response = make_response(body)
         response.headers["Content-Type"] = "text/html"
-        response.headers['X-Content-Type-Options'] = 'nosniff'
         return response
     
 @app.route('/login', methods=['GET', 'POST'])
@@ -117,7 +115,6 @@ def login():
             body = render_template('blog.html')
             resp = make_response(body)
             resp.headers["Content-Type"] = "text/html"
-            resp.headers['X-Content-Type-Options'] = 'nosniff'
             resp.set_cookie('auth_token', base64.b64encode(token).decode('utf-8'), httponly=True, max_age=3600)
             return resp
         else:
@@ -126,13 +123,11 @@ def login():
             body = render_template('login.html', loginFailMessage=loginFailMessage)
             response = make_response(body)
             response.headers["Content-Type"] = "text/html"
-            response.headers['X-Content-Type-Options'] = 'nosniff'
             return response
     
     body = render_template('login.html')
     response = make_response(body)
     response.headers["Content-Type"] = "text/html"
-    response.headers['X-Content-Type-Options'] = 'nosniff'
     return response
 
 
@@ -143,7 +138,6 @@ def blogPage():
     body = render_template('blog.html')
     response = make_response(body)
     response.headers["Content-Type"] = "text/html"
-    response.headers['X-Content-Type-Options'] = 'nosniff'
     return response
 
 
