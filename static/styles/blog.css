@@ -132,7 +132,10 @@ body {
     font-weight: bold;
 }
 .published-post{
-    display: "none"
+    display: "none";
+    width: 0px;
+  
+    height: 0px;
 }
 .chat-message{
     border: 1px solid #ddd;
@@ -144,6 +147,7 @@ body {
     height: auto;
     overflow-y: auto;
     position: relative;
+
 
 }
 .content {

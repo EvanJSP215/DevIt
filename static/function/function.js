@@ -104,7 +104,7 @@ function addMessage(messageJSON) {
     const like = messageJSON.likeCount
     const messageId = messageJSON.id;
     let messageHTML = "";
-    messageHTML += "<div class='chat-message' value="+messageId.id +">\
+    messageHTML += "<div class='chat-message' value="+messageId +">\
                         <div class='username'>"+username+"</div>\
                         <div class='content'>"+message+"</div>\
                         <button class='like-button'>👍"+like+"</button>\
