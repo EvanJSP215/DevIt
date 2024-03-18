@@ -44,25 +44,28 @@ def landing_page():
 def handle_img(filename):
     path = 'static/images'
     if filename == 'favicon.ico':
-        response = make_response(send_from_directory(path, filename))
+        response = make_response(send_from_directory(path, filename),200)
         response.headers["Content-Type"] = "image/x-icon"
     else:
-        response = make_response(send_from_directory(path, filename))
+        response = make_response(send_from_directory(path, filename),200)
         response.headers["Content-Type"] = "image/png"
+
 
     return response
 
-@app.route('/static/styles/filename', methods=['GET'])
+
+@app.route('/static/styles/<filename>', methods=['GET'])
 def handle_css(filename):
-    body = render_template(filename)
-    response = make_response(body)
+    path = 'static/styles'
+    response = make_response(send_from_directory(path, filename),200)
     response.headers["Content-Type"] = "text/css"
     return response
 
-@app.route('/static/function/filename', methods=['GET'])
+
+@app.route('/static/function/<filename>', methods=['GET'])
 def handle_js(filename):
-    body = render_template(filename)
-    response = make_response(body)
+    path = 'static/function'
+    response = make_response(send_from_directory(path, filename),200)
     response.headers["Content-Type"] = "application/javascript"
     return response
 
@@ -188,16 +191,25 @@ def blogPage():
     else:
         #get request
         authcookie = request.cookies.get('auth_token',None)
-        username = 'Guest'
-        if authcookie != None:
+        if(authcookie):
             haskAuthCookie = hashlib.sha256(authcookie).hexdigest()
+            username = 'Guest'
             authUser = authtoken.find_one({'authtoken_hash' : haskAuthCookie})
             if authUser:
                 username = authUser['email']
-        body = render_template('blog.html', UsernameReplace= username)
-        response = make_response(body)
-        response.headers["Content-Type"] = "text/html"
-        return response
+            
+            body = render_template('blog.html', UsernameReplace= username)
+            response = make_response(body)
+            response.headers["Content-Type"] = "text/html"
+            return response
+
+        else:
+            authcookie = request.cookies.get('auth_token',None)
+            username = 'Guest'
+            body = render_template('blogLogin.html', UsernameReplace= username)
+            response = make_response(body)
+            response.headers["Content-Type"] = "text/html"
+            return response
 
 @app.route('/chat', methods=['GET'])
 def chatm():
