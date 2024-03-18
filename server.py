@@ -180,7 +180,7 @@ def blogPage():
             # no auth cookie
             email = 'Guest'
         
-        blogData = {'message': message, 'email': email, 'id': str(chatId), 'likeCount' : "0"}
+        blogData = {'message': message, 'email': email, 'id': str(chatId), 'likeCount' : "0" , 'status': 'Active'}
         chat.insert_one(blogData)
         body = render_template('blog.html', UsernameReplace= email)
         response = make_response(body)
@@ -213,10 +213,20 @@ def blogPage():
 
 @app.route('/chat', methods=['GET'])
 def chatm():
-    chatData = chat.find({})
+    chatData = chat.find({'status': 'Active'})
     arr =[]
+    authcookie = request.cookies.get('auth_token',None)
+    email = 'None'
+    if authcookie:
+        haskAuthCookie = hashlib.sha256(authcookie.encode()).hexdigest()
+        authUser = authtoken.find_one({'authtoken_hash' : haskAuthCookie})
+        if authUser:
+            email = authUser['email']
     for result in chatData:
-        dic = {'message': result['message'], 'username': result['email'], 'id': result['id'], 'likeCount' : result['likeCount']}
+        edit = 'False'
+        if email == result['email']:
+            edit = 'True'
+        dic = {'message': result['message'], 'username': result['email'], 'id': result['id'], 'likeCount' : result['likeCount'], 'edit_permission': edit}
         arr.append(dic)
     jsonStr = json.dumps(arr)
     body = jsonStr
@@ -243,6 +253,52 @@ def logout():
         response.headers["Content-Type"] = "text/html"
         response.set_cookie('auth_token', '0', httponly=True, max_age=-3600)
         return response
+    
+@app.route("/chat/<messageId>", methods=['DELETE'])
+def deletemsg(messageId):
+    authcookie = request.cookies.get('auth_token',None)
+    if(authcookie):
+        find = chat.find_one({'id': messageId})
+        if(find):
+            haskAuthCookie = hashlib.sha256(authcookie.encode()).hexdigest()
+            authUser = authtoken.find_one({'authtoken_hash' : haskAuthCookie})
+            if authUser['email'] == find['email']:
+                chat.update_one({'id': messageId}, {'$set': {'status': 'Deleted'}})
+                response = make_response(jsonify('Deleted'), 200)
+                
+                return response
+            else:
+                response = make_response(jsonify('Not the actual user'), 404)
+                return response
+        else:
+            response = make_response(jsonify('Message not found'), 204)
+            return response 
+    response = make_response(jsonify('Not authenticated'), 404)
+    return response
+
+@app.route("/chat/<messageId>", methods=['PUT'])
+def updatemsg(messageId):
+    authcookie = request.cookies.get('auth_token',None)
+    if(authcookie):
+        find = chat.find_one({'id': messageId})
+        if(find):
+            haskAuthCookie = hashlib.sha256(authcookie.encode()).hexdigest()
+            authUser = authtoken.find_one({'authtoken_hash' : haskAuthCookie})
+            if authUser['email'] == find['email']:
+                msg = request.json
+                message = msg.get('message')
+                print(message)
+                chat.update_one({'id': messageId}, {'$set': {'message': message}})
+                response = make_response(jsonify('Updated'), 200)
+                return response
+            else:
+                response = make_response(jsonify('Not the actual user'), 404)
+                return response
+        else:
+            response = make_response(jsonify('Message not found'), 204)
+            return response 
+    response = make_response(jsonify('Not authenticated'), 404)
+    return response
 
 
 if __name__ == "__main__":

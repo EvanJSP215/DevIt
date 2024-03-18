@@ -96,25 +96,87 @@ function regcheck(){
 
 function blogConfirm(){
 }
-// id='message_" + messageId + "'><b>" + username + "</b>: " + message + "</div></br>
+
 function addMessage(messageJSON) {
     const chatMessages = document.getElementById("chatMessage");
     const username = messageJSON.username;
     const message = messageJSON.message;
     const like = messageJSON.likeCount
     const messageId = messageJSON.id;
+    const permission = messageJSON.edit_permission;
     let messageHTML = "";
     messageHTML += "<div class='chat-message' value="+messageId +">\
                         <div class='username'>"+username+"</div>\
-                        <div class='content'>"+message+"</div>\
+                        <div id='msg_" + messageId + "' class='content'>" + message + "</div>\
                         <button class='like-button'>👍"+like+"</button>\
-                    </div>";
+                        ";
+    if (permission === 'True'){
+        messageHTML += "<button class='delete-button' onclick='deleteMessage(" + messageId + ")'>Delete</button>";
+        messageHTML += "<button id='button_" + messageId + "' class='edit-button' onclick='updateMessage(" + messageId + ")'>Edit</button>";
+    }
+    messageHTML += '</div>';
     chatMessages.innerHTML += messageHTML;
 }
+
+
 function clearChat() {
     const chatMessages = document.getElementById("chatMessage");
     chatMessages.innerHTML = "";
 }
+
+function deleteMessage(messageId){
+    const delete_request = new XMLHttpRequest();
+    delete_request.onreadystatechange = function () {
+        if (this.readyState === 4 && this.status === 200) {
+            console.log(this.response);
+        }
+    }
+    delete_request.open("DELETE", "/chat/" + messageId);
+    delete_request.send();
+}
+
+function updateMessage(messageId) {
+    const message = document.getElementById('msg_' + messageId);
+    if (message) {
+        const textinput = document.createElement('textarea');
+        textinput.value = message.textContent;
+        textinput.cols = 80;
+        textinput.id = 'msg_' + messageId;
+        message.replaceWith(textinput);
+        /* Replace edit button with update */
+        const edit = document.getElementById('button_' + messageId);
+        const update = document.createElement('button');
+        update.textContent = 'Update';
+        update.classList.add('edit-button');
+        update.id = 'button_' + messageId;
+        update.onclick = function(){
+            const update_request = new XMLHttpRequest();
+            update_request.onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 200) {
+                    console.log(this.response);}
+            }
+            const box = document.getElementById('msg_' + messageId);
+            update_request.open("PUT", "/chat/" + messageId);
+            const message = box.value;
+            update_request.setRequestHeader("Content-Type", "application/json");
+            update_request.send(JSON.stringify({ "message": message }));
+            const text = document.createElement('div');
+            text.id = 'msg_' + messageId;
+            text.classList.add('content');
+            box.replaceWith(text);
+            const updatebutton = document.getElementById('button_' + messageId)
+            const editbutton = document.createElement('button');
+            editbutton.textContent = 'Edit';
+            editbutton.classList.add('edit-button');
+            editbutton = 'button_' + messageId;
+            editbutton.onclick = "updateMessage(" + messageId + ")"
+            updatebutton.replaceWith(editbutton)
+        }
+        edit.replaceWith(update);
+        };
+        
+    }
+
 function chatRequest(){
     const request = new XMLHttpRequest();
     request.onreadystatechange = function () {
@@ -130,7 +192,7 @@ function chatRequest(){
     request.send();
 }
 
-setInterval(chatRequest, 1000);
+setInterval(chatRequest, 4000);
 
 
 
