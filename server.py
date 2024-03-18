@@ -9,21 +9,29 @@ import hashlib
 import os
 import base64
 import requests
+import json
+
 
 app = Flask(__name__)
 mongo_client = MongoClient("mongo")
 db = mongo_client["TBD"]
 auth = db['auth']
-token = db['token']
+authtoken = db['token']
 chat = db['chat']
+id = db['chatid']
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+
+#add a nosniff after all responses
+@app.after_request
+def nosniff(response):
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    return response
 
 @app.route("/")
 def landing_page():
     body = render_template("landingPage.html")
     response = make_response(body)
     response.headers["Content-Type"] = "text/html"
-    response.headers['X-Content-Type-Options'] = 'nosniff'
     return response
 
 @app.route("/static/images/<filename>", methods=['GET'])
@@ -36,7 +44,6 @@ def handle_img(filename):
         response = make_response(send_from_directory(path, filename))
         response.headers["Content-Type"] = "image/png"
 
-    response.headers['X-Content-Type-Options'] = 'nosniff'
     return response
 
 @app.route('/static/styles/filename', methods=['GET'])
@@ -44,7 +51,6 @@ def handle_css(filename):
     body = render_template(filename)
     response = make_response(body)
     response.headers["Content-Type"] = "text/css"
-    response.headers['X-Content-Type-Options'] = 'nosniff'
     return response
 
 @app.route('/static/function/filename', methods=['GET'])
@@ -52,7 +58,6 @@ def handle_js(filename):
     body = render_template(filename)
     response = make_response(body)
     response.headers["Content-Type"] = "application/javascript"
-    response.headers['X-Content-Type-Options'] = 'nosniff'
     return response
 
 
@@ -70,7 +75,6 @@ def register():
             body = render_template('register.html', Failmessage=Failmessage )
             response = make_response(body,403)
             response.headers["Content-Type"] = "text/html"
-            response.headers['X-Content-Type-Options'] = 'nosniff'
             return response
         #if the email is already registered
         if check:
@@ -78,7 +82,6 @@ def register():
             body = render_template('register.html', Failmessage=Failmessage )
             response = make_response(body,403)
             response.headers["Content-Type"] = "text/html"
-            response.headers['X-Content-Type-Options'] = 'nosniff'
             return response
         email = email.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
         password = password.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
@@ -90,13 +93,11 @@ def register():
         body = render_template("login.html")
         response = make_response(body)
         response.headers["Content-Type"] = "text/html"
-        response.headers['X-Content-Type-Options'] = 'nosniff'
         return response
     else:
         body = render_template("register.html")
         response = make_response(body)
         response.headers["Content-Type"] = "text/html"
-        response.headers['X-Content-Type-Options'] = 'nosniff'
         return response
     
 @app.route('/login', methods=['GET', 'POST'])
@@ -108,23 +109,22 @@ def login():
 
         if user and bcrypt.checkpw(password, user['password']):
             # Generate a random token and its hash
-            token = os.urandom(24)
-            token_hash = hashlib.sha256(token).hexdigest()
+            token = secrets.token_urlsafe(80)
+            token_hash = hashlib.sha256(token.encode()).hexdigest()
 
             # Store the hash of the token in the database
-            authentication = token.find_one({'email': email})
+            authentication = authtoken.find_one({'email': email})
             if (authentication):
-                token.update_one({'email': email}, {'$set': {'token_hash': token_hash}})
+                authtoken.update_one({'email': email}, {'$set': {'authtoken_hash': token_hash}})
             else:
-                auth_user = {"email": email,'token_hash': token_hash}
-                token.insert_one(auth_user)
+                auth_user = {"email": email,'authtoken_hash': token_hash}
+                authtoken.insert_one(auth_user)
 
             # change the url for blog page
-            body = render_template('blog.html')
+            body = render_template('blog.html', UsernameReplace=email)
             resp = make_response(body)
             resp.headers["Content-Type"] = "text/html"
-            resp.headers['X-Content-Type-Options'] = 'nosniff'
-            resp.set_cookie('auth_token', base64.b64encode(token).decode('utf-8'), httponly=True, max_age=3600)
+            resp.set_cookie('auth_token', token, httponly=True, max_age=3600)
             return resp
         else:
             # Authentication failed
@@ -132,29 +132,79 @@ def login():
             body = render_template('login.html', loginFailMessage=loginFailMessage)
             response = make_response(body)
             response.headers["Content-Type"] = "text/html"
-            response.headers['X-Content-Type-Options'] = 'nosniff'
             return response
     
     body = render_template('login.html')
     response = make_response(body)
     response.headers["Content-Type"] = "text/html"
-    response.headers['X-Content-Type-Options'] = 'nosniff'
     return response
 
 
 @app.route('/blogPage', methods=['GET', 'POST'])
 def blogPage():
-    # if request.method == 'POST':
+    if request.method == 'POST':
+        message = request.form.get("message",None)
+        authcookie = request.cookies.get('auth_token',None)
+        if message != None:
+            message = message.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
+        else:
+            message = "none"
+        uid = id.find_one({})
+        chatId = None
+        if uid:
+            chatId = uid['id']
+            chatId = int(chatId) + 1
+            id.update_one({}, {'$set':{'id' : str(chatId)}})
+        else:
+            id.insert_one({'id' : "0"})
+            chatId = id.find_one({})
+            chatId = chatId['id']
+        if authcookie != None:
+            haskAuthCookie = hashlib.sha256(authcookie.encode()).hexdigest()
+            authUser = authtoken.find_one({'authtoken_hash' : haskAuthCookie})
+            if authUser:
+                email = authUser['email']
+            else:
+                # have the authcookie but authtoken does not exist
+                email = 'Guest'
+        else:
+            # no auth cookie
+            email = 'Guest'
         
-    body = render_template('blog.html')
+        blogData = {'message': message, 'email': email, 'id': str(chatId), 'likeCount' : "0"}
+        chat.insert_one(blogData)
+        body = render_template('blog.html', UsernameReplace= email)
+        response = make_response(body)
+        response.headers["Content-Type"] = 'text/html'
+
+        return response
+              
+    else:
+        #get request
+        authcookie = request.cookies.get('auth_token',None)
+        username = 'Guest'
+        if authcookie != None:
+            haskAuthCookie = hashlib.sha256(authcookie).hexdigest()
+            authUser = authtoken.find_one({'authtoken_hash' : haskAuthCookie})
+            if authUser:
+                username = authUser['email']
+        body = render_template('blog.html', UsernameReplace= username)
+        response = make_response(body)
+        response.headers["Content-Type"] = "text/html"
+        return response
+
+@app.route('/chat', methods=['GET'])
+def chatm():
+    chatData = chat.find({})
+    arr =[]
+    for result in chatData:
+        dic = {'message': result['message'], 'username': result['email'], 'id': result['id'], 'likeCount' : result['likeCount']}
+        arr.append(dic)
+    jsonStr = json.dumps(arr)
+    body = jsonStr
     response = make_response(body)
-    response.headers["Content-Type"] = "text/html"
-    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers["Content-Type"] = "application/json"
     return response
-
-
-
-
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080, debug=True)

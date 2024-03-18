@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/blog.css') }}">
+    <link rel="icon" href= "{{ url_for('static', filename='images/logo.png') }}">
     <title>Blog</title>
 </head>
 
@@ -11,6 +12,7 @@
     <div class="head-container">
         <div class="left-content">
             TBD
+            <button>login</button>
             <!-- <link rel="icon" href= "{{ url_for('static', filename='images/logo.png') }}"> -->
         </div>
         <div class="right-content">
@@ -21,7 +23,7 @@
     <!-- this is the user information that is displayed on the left side -->
     <div class = "content-container">
         <div class="user-info-container">
-            <div class="display-Username">{{Username}}</div>
+            <div class="display-Username">{{UsernameReplace}}</div>
             <div class="counters">
                 <span>Following: {{followingCount}}</span>
                 <span>Followers: {{followerCount}}</span>
@@ -31,33 +33,28 @@
 
         <!-- this is the where you post blog/images -->
         <div class="chat-container">
-            <form action="/chatform" method="post" enctype='application/x-www-form-urlencoded'>
-                <label>
-                    Chat:
-                </label>
+            <form action="/blogPage" method="post" enctype='application/x-www-form-urlencoded'>
                 <div class="post">
-                    <textarea class= post-input type="text" name="message" placeholder="want to share something? Type it here"></textarea>
+                    <textarea class= "post-input" type="text" id="message" name="message" placeholder="want to share something? Type it here"></textarea>
                     <input type="hidden" id="xsrfToken"  name="xsrfToken" value="{{xsrf}}">
                 </br>
                     <button class="Upload-button">Upload</button>
                     <button class="publish-button" type="submit">Publish</button>
-                </div>
+                </div>  
             </form>
             
             <!-- this is the display part -->
             <div class="published-post">
-                <div class="username">{{PostUsername}}</div>
-                <div class="content">TEXT/ BLOG POST/ IMAGES</div>
-                <div id = chatMessage>
+                <div id = "chatMessage" class="content"></div>
                      <!-- Chat messages will be displayed here -->
-                </div>
-                <div class="icons">
+                <!-- <div class="icons">
                     <label>
-                        <button class="like-button">👍</button> ({{like count}})
+                        <button class="like-button">👍({{likecount}})</button>
                     </label>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>
 </body>
+<script src="{{ url_for('static', filename='function/function.js') }}"></script> 
 </html>

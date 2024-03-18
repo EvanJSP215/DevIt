@@ -96,7 +96,41 @@ function regcheck(){
 
 function blogConfirm(){
 }
+// id='message_" + messageId + "'><b>" + username + "</b>: " + message + "</div></br>
+function addMessage(messageJSON) {
+    const chatMessages = document.getElementById("chatMessage");
+    const username = messageJSON.username;
+    const message = messageJSON.message;
+    const like = messageJSON.likeCount
+    const messageId = messageJSON.id;
+    let messageHTML = "";
+    messageHTML += "<div class='chat-message' value="+messageId.id +">\
+                        <div class='username'>"+username+"</div>\
+                        <div class='content'>"+message+"</div>\
+                        <button class='like-button'>👍"+like+"</button>\
+                    </div>";
+    chatMessages.innerHTML += messageHTML;
+}
+function clearChat() {
+    const chatMessages = document.getElementById("chatMessage");
+    chatMessages.innerHTML = "";
+}
+function chatRequest(){
+    const request = new XMLHttpRequest();
+    request.onreadystatechange = function () {
+        if (this.readyState === 4 && this.status === 200) {
+            const messages = JSON.parse(this.response);
+            clearChat();
+            for (const message of messages.reverse()) {
+                addMessage(message);
+            }
+        }
+    }
+    request.open("GET", "/chat"); 
+    request.send();
+}
 
+setInterval(chatRequest, 1000);
 
 
 

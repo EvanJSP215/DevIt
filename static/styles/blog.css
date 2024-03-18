@@ -131,13 +131,20 @@ body {
 .counters span {
     font-weight: bold;
 }
-.published-post {
+.published-post{
+    display: "none"
+}
+.chat-message{
     border: 1px solid #ddd;
     padding: 10px;
     margin-top: 20px;
     background-color: white;
     margin-left: -200px;
     border-radius: 3%;
+    height: auto;
+    overflow-y: auto;
+    position: relative;
+
 }
 .content {
     margin-top: 10px;
