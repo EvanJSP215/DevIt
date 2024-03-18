@@ -66,7 +66,7 @@ def handle_css(filename):
 def handle_js(filename):
     path = 'static/function'
     response = make_response(send_from_directory(path, filename),200)
-    response.headers["Content-Type"] = "application/javascript"
+    response.headers["Content-Type"] = "application/javascript; charset=utf-8"
     return response
 
 

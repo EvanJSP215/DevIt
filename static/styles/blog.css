@@ -148,11 +148,11 @@ body {
     background-color: white;
     margin-left: -200px;
     margin-right: -520px;
-    border-radius: 3%;
     height: auto;
     overflow-y: auto;
     position: relative;
-
+    border-radius: 10px;
+    overflow-wrap: break-word;
 
 }
 .content {
