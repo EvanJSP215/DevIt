@@ -27,6 +27,12 @@ def nosniff(response):
     response.headers['X-Content-Type-Options'] = 'nosniff'
     return response
 
+#add a nosniff after all responses
+@app.after_request
+def nosniff(response):
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    return response
+
 @app.route("/")
 def landing_page():
     body = render_template("landingPage.html")

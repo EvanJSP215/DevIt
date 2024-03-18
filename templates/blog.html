@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/blog.css') }}">
     <link rel="icon" href= "{{ url_for('static', filename='images/logo.png') }}">
+    <link rel="icon" href= "{{ url_for('static', filename='images/logo.png') }}">
     <title>Blog</title>
 </head>
 
@@ -49,7 +50,7 @@
                      <!-- Chat messages will be displayed here -->
                 <!-- <div class="icons">
                     <label>
-                        <button class="like-button">👍({{likecount}})</button>
+                        <button class="like-button">👍 ({{ like_count }})</button>
                     </label>
                 </div> -->
             </div>
