@@ -14,9 +14,9 @@
         <div class="left-content">
             TBD
         </div>
-        <div class="right-content">
-            <button class = "logout-button"> logout </button>
-        </div>
+        <form action="/logout" method="post" enctype="application/x-www-form-urlencoded" class="right-content">
+            <button class = "logout-button"> LogOut </button>
+        </form>
     </div>
 
     <!-- this is the user information that is displayed on the left side -->
@@ -24,9 +24,9 @@
         <div class="user-info-container">
             <div class="display-Username">{{UsernameReplace}}</div>
             <div class="counters">
-                <span>Following: {{followingCount}}</span>
-                <span>Followers: {{followerCount}}</span>
-                <span>Posts: {{postCount}}</span>
+                <span  class="counter-item">Following: {{followingCount}}</span>
+                <span  class="counter-item">Followers: {{followerCount}}</span>
+                <span  class="counter-item">Posts: {{postCount}}</span>
             </div>
         </div>
 
@@ -45,12 +45,6 @@
             <!-- this is the display part -->
             <div class="published-post">
                 <div id = "chatMessage" class="content"></div>
-                     <!-- Chat messages will be displayed here -->
-                <!-- <div class="icons">
-                    <label>
-                        <button class="like-button">👍 ({{ like_count }})</button>
-                    </label>
-                </div> -->
             </div>
         </div>
     </div>

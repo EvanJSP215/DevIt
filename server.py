@@ -192,7 +192,7 @@ def blogPage():
         #get request
         authcookie = request.cookies.get('auth_token',None)
         if(authcookie):
-            haskAuthCookie = hashlib.sha256(authcookie).hexdigest()
+            haskAuthCookie = hashlib.sha256(authcookie.encode()).hexdigest()
             username = 'Guest'
             authUser = authtoken.find_one({'authtoken_hash' : haskAuthCookie})
             if authUser:
@@ -223,6 +223,27 @@ def chatm():
     response = make_response(body)
     response.headers["Content-Type"] = "application/json"
     return response
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    authcookie = request.cookies.get('auth_token',None)
+    if(authcookie):
+        haskAuthCookie = hashlib.sha256(authcookie.encode()).hexdigest()
+        authtoken.delete_one({'authtoken_hash' : haskAuthCookie})
+        username = 'Guest'
+        body = render_template('blogLogin.html', UsernameReplace= username)
+        response = make_response(body,302)
+        response.headers["Content-Type"] = "text/html"
+        response.set_cookie('auth_token', '0', httponly=True, max_age=-3600)
+        return response
+    else:
+        username = 'Guest'
+        body = render_template('blogLogin.html', UsernameReplace= username)
+        response = make_response(body,302)
+        response.headers["Content-Type"] = "text/html"
+        response.set_cookie('auth_token', '0', httponly=True, max_age=-3600)
+        return response
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080, debug=True)
