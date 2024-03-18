@@ -25,8 +25,27 @@
             <span class="block-text">Create your Blog</span>
         </button>
     </form>
+
+    <div class="popup-container" id="popupContainer">
+        <div class="popup">
+            <div class="popup-text">Do you want to be redirected to the blog page as a guest?</div>
+            <div class="popup-buttons">
+                <form id="popupForm" action="/blogPage" method="get" enctype="application/x-www-form-urlencoded">
+                    <button type="submit" class="popup-button yes-button">Yes</button>
+                </form>
+                <a href="/login"><button type="button" class="popup-button no-button">No</button></a>
+            </div>
+        </div>
+    </div> 
+    
+
+    
+
+    
+
 </body>
 
 <script src="{{ url_for('static', filename='function/function.js') }}"></script> 
+<script src="{{ url_for('static', filename='function/popup.js') }}"></script>
 
 </html>
