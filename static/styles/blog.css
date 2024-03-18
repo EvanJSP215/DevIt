@@ -104,6 +104,7 @@ body {
     height: 132px; width: 685px;
     resize: none;
 }
+
 .Upload-button{
     background-color: #2d8ff7;
     color: #fff;
@@ -130,6 +131,36 @@ body {
     border-radius: 5px;
 }
 
+.edit-button{
+    background-color: #2d8ff7;
+    color: #fff;
+    border: none;
+    padding: 5px 5px;
+    cursor: pointer;
+    align-self: flex-end; 
+    font-weight: bold;
+    margin-top: -25.7px;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.458); 
+    border-radius: 5px;
+    margin-left: 5px;
+}
+
+.delete-button{
+    background-color: #2d8ff7;
+    color: #fff;
+    border: none;
+    padding: 5px 5px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 30px;
+    align-self: flex-start;
+    margin-left: 540px;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.458); 
+    border-radius: 5px;
+}
+
+.delete-button:hover,
+.edit-button:hover,
 .Upload-button:hover,
 .publish-button:hover{
     background: #005A8C; /* Change background color on hover */
@@ -141,7 +172,7 @@ body {
     width: 0px;
     height: 0px;
 }
-.chat-message{
+.chat-message {
     border: 1px solid #ddd;
     padding: 10px;
     margin-top: 20px;
@@ -149,17 +180,16 @@ body {
     margin-left: -200px;
     margin-right: -520px;
     border-radius: 3%;
-    height: auto;
-    overflow-y: auto;
+    max-height: auto; 
+    overflow-y: auto; 
     position: relative;
-
-
 }
+
 .content {
     margin-top: 10px;
     background-color: white;
-    height: 200px;
     border-radius: 3%;
+    font-size: 16px; 
 }
 .icons {
     display: flex;
