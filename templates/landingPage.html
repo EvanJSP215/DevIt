@@ -21,31 +21,26 @@
     <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Blog Image" id="GoBlog">
     <p>Create your unique and stunning blog easily</p>
     <form action="/blogPage" method="get" enctype="application/x-www-form-urlencoded" onsubmit="return blogConfirm()">
-        <button type="submit" class="button-style">
+        <button type="submit" class="button-style" id="triggerBtn">
             <span class="block-text">Create your Blog</span>
         </button>
     </form>
 
+    <!-- Popup Container -->
     <div class="popup-container" id="popupContainer">
         <div class="popup">
             <div class="popup-text">Do you want to be redirected to the blog page as a guest?</div>
-            <div class="popup-buttons">
-                <form id="popupForm" action="/blogPage" method="get" enctype="application/x-www-form-urlencoded">
-                    <button type="submit" class="popup-button yes-button">Yes</button>
-                </form>
-                <a href="/login"><button type="button" class="popup-button no-button">No</button></a>
-            </div>
+            <button type="button" class="popup-button yes-button" onclick="redirectToBlogPage()">Yes</button>
+            <button type="button" class="popup-button no-button" onclick="redirectToLoginPage()">No</button>
         </div>
-    </div> 
+    </div>
     
-
-    
-
-    
-
 </body>
 
 <script src="{{ url_for('static', filename='function/function.js') }}"></script> 
-<script src="{{ url_for('static', filename='function/popup.js') }}"></script>
+<script src="{{ url_for('static', filename='function/popup.js') }}"></script> 
+
+
 
 </html>
+
