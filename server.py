@@ -20,6 +20,7 @@ authtoken = db['token']
 chat = db['chat']
 id = db['chatid']
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+likes = db['likes']
 
 #add a nosniff after all responses
 @app.after_request
@@ -210,6 +211,24 @@ def blogPage():
             response = make_response(body)
             response.headers["Content-Type"] = "text/html"
             return response
+        
+@app.route('/like/<messageId>', methods=['POST'])
+def like_post(messageId):
+    authcookie = request.cookies.get('auth_token', None)
+    if not authcookie:
+        return jsonify({'error': 'Authentication required'}), 401
+
+    hashAuthCookie = hashlib.sha256(authcookie.encode()).hexdigest()
+    user = authtoken.find_one({'authtoken_hash': hashAuthCookie})
+    if not user:
+        return jsonify({'error': 'User not authenticated'}), 403
+
+    already_liked = likes.find_one({'messageId': messageId, 'email': user['email']})
+    if already_liked:
+        return jsonify({'error': 'You have already liked this post'}), 400
+
+    likes.insert_one({'messageId': messageId, 'email': user['email']})
+    return jsonify({'message': 'Like added successfully'}), 200
 
 @app.route('/chat', methods=['GET'])
 def chatm():
@@ -218,12 +237,14 @@ def chatm():
     authcookie = request.cookies.get('auth_token',None)
     email = 'None'
     if authcookie:
-        haskAuthCookie = hashlib.sha256(authcookie.encode()).hexdigest()
-        authUser = authtoken.find_one({'authtoken_hash' : haskAuthCookie})
+        hashAuthCookie = hashlib.sha256(authcookie.encode()).hexdigest()
+        authUser = authtoken.find_one({'authtoken_hash' : hashAuthCookie})
         if authUser:
             email = authUser['email']
     for result in chatData:
         edit = 'False'
+        like_count = likes.count_documents({'messageId': result['id']})
+        result['likeCount'] = str(like_count)
         if email == result['email']:
             edit = 'True'
         dic = {'message': result['message'], 'username': result['email'], 'id': result['id'], 'likeCount' : result['likeCount'], 'edit_permission': edit}

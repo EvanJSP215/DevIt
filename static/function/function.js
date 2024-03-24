@@ -99,23 +99,29 @@ function blogConfirm(){
 
 function addMessage(messageJSON) {
     const chatMessages = document.getElementById("chatMessage");
-    const username = messageJSON.username;
-    const message = messageJSON.message;
-    const like = messageJSON.likeCount
-    const messageId = messageJSON.id;
-    const permission = messageJSON.edit_permission;
-    let messageHTML = "";
-    messageHTML += "<div class='chat-message' value="+messageId +">\
-                        <div class='username'>"+username+"</div>\
-                        <div id='msg_" + messageId + "' class='content'>" + message + "</div>\
-                        <button class='like-button'>👍"+like+"</button>\
-                        ";
-    if (permission === 'True'){
-        messageHTML += "<button class='delete-button' onclick='deleteMessage(" + messageId + ")'>Delete</button>";
-        messageHTML += "<button id='button_" + messageId + "' class='edit-button' onclick='updateMessage(" + messageId + ")'>Edit</button>";
+    let messageHTML = `<div class='chat-message' value=${messageJSON.id}>
+                            <div class='username'>${messageJSON.username}</div>
+                            <div id='msg_${messageJSON.id}' class='content'>${messageJSON.message}</div>
+                            <button onclick="likePost('${messageJSON.id}')" class='like-button'>👍 ${messageJSON.likeCount}</button>`;
+    if (messageJSON.edit_permission === 'True'){
+        messageHTML += `<button class='delete-button' onclick='deleteMessage("${messageJSON.id}")'>Delete</button>
+                        <button id='button_${messageJSON.id}' class='edit-button' onclick='updateMessage("${messageJSON.id}")'>Edit</button>`;
     }
     messageHTML += '</div>';
     chatMessages.innerHTML += messageHTML;
+}
+
+function likePost(messageId) {
+    fetch(`/like/${messageId}`, { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+            } else {
+                chatRequest(); // Call chatRequest to refresh the messages and their like counts
+            }
+        })
+        .catch(error => console.error('Error liking the post:', error));
 }
 
 
