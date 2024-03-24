@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, send_from_directory, jsonify, make_response, flash
 from pymongo import MongoClient
-from flask import session
+from flask import session,redirect, url_for
 from datetime import datetime, timedelta
 import datetime
 import bcrypt
@@ -16,7 +16,7 @@ app = Flask(__name__)
 mongo_client = MongoClient("mongo")
 db = mongo_client["TBD"]
 auth = db['auth']
-authtoken = db['token']
+authtoken = db['authtoken']
 chat = db['chat']
 id = db['chatid']
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
@@ -100,7 +100,7 @@ def register():
         user = {"email": email,'password': hashedpw,'csrf':csrf}
         auth.insert_one(user)
         check = auth.find_one({'email': email})
-        body = render_template("login.html")
+        body = make_response(redirect(url_for('login')))
         response = make_response(body)
         response.headers["Content-Type"] = "text/html"
         return response
@@ -131,7 +131,7 @@ def login():
                 authtoken.insert_one(auth_user)
 
             # change the url for blog page
-            body = render_template('blog.html', UsernameReplace=email)
+            body = make_response(redirect(url_for('blogPage')))
             resp = make_response(body)
             resp.headers["Content-Type"] = "text/html"
             resp.set_cookie('auth_token', token, httponly=True, max_age=3600)
@@ -199,15 +199,22 @@ def blogPage():
             if authUser:
                 username = authUser['email']
             
-            body = render_template('blog.html', UsernameReplace= username)
-            response = make_response(body)
-            response.headers["Content-Type"] = "text/html"
-            return response
-
+                body = render_template('blog.html', UsernameReplace= username)
+                response = make_response(body)
+                response.headers["Content-Type"] = "text/html"
+                return response
+            
+            else:
+                # token did not match
+                username = 'Guest'
+                body = make_response(redirect(url_for('logout')))
+                response = make_response(body)
+                response.headers["Content-Type"] = "text/html"
+                return response
         else:
-            authcookie = request.cookies.get('auth_token',None)
+            # no authcookie 
             username = 'Guest'
-            body = render_template('blogLogin.html', UsernameReplace= username)
+            body = make_response(redirect(url_for('loginout')))
             response = make_response(body)
             response.headers["Content-Type"] = "text/html"
             return response

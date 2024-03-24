@@ -47,7 +47,7 @@ function checklower(pw){
 
 function checkspecial(pw){
     var special = document.getElementById('specials');
-    if(/[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-='"]/.test(pw)){
+    if(/[!@#$%^&*()_+{}\:;<>,.?~\\/-='"]/.test(pw)){
         special.checked = true;
         return true;
     }
