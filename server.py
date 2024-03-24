@@ -183,41 +183,11 @@ def blogPage():
         
         blogData = {'message': message, 'email': email, 'id': str(chatId), 'likeCount' : "0" , 'status': 'Active'}
         chat.insert_one(blogData)
-        body = render_template('blog.html', UsernameReplace= email)
-        response = make_response(body)
-        response.headers["Content-Type"] = 'text/html'
-
-        return response
+        return getBlogPage()
               
     else:
-        #get request
-        authcookie = request.cookies.get('auth_token',None)
-        if(authcookie):
-            haskAuthCookie = hashlib.sha256(authcookie.encode()).hexdigest()
-            username = 'Guest'
-            authUser = authtoken.find_one({'authtoken_hash' : haskAuthCookie})
-            if authUser:
-                username = authUser['email']
-            
-                body = render_template('blog.html', UsernameReplace= username)
-                response = make_response(body)
-                response.headers["Content-Type"] = "text/html"
-                return response
-            
-            else:
-                # token did not match
-                username = 'Guest'
-                body = make_response(redirect(url_for('logout')))
-                response = make_response(body)
-                response.headers["Content-Type"] = "text/html"
-                return response
-        else:
-            # no authcookie 
-            username = 'Guest'
-            body = make_response(redirect(url_for('loginout')))
-            response = make_response(body)
-            response.headers["Content-Type"] = "text/html"
-            return response
+        return getBlogPage()
+        
         
 @app.route('/like/<messageId>', methods=['POST'])
 def like_post(messageId):
@@ -328,6 +298,35 @@ def updatemsg(messageId):
     response = make_response(jsonify('Not authenticated'), 404)
     return response
 
+def getBlogPage():
+    #get request
+        authcookie = request.cookies.get('auth_token',None)
+        if(authcookie):
+            haskAuthCookie = hashlib.sha256(authcookie.encode()).hexdigest()
+            username = 'Guest'
+            authUser = authtoken.find_one({'authtoken_hash' : haskAuthCookie})
+            if authUser:
+                username = authUser['email']
+                body = render_template('blog.html', UsernameReplace= username)
+                response = make_response(body)
+                response.headers["Content-Type"] = "text/html"
+                return response 
+            else:
+                # token did not match
+                username = 'Guest'
+                #body = make_response(redirect(url_for('logout')))
+                body = render_template('blogLogin.html', UsernameReplace= username)
+                response = make_response(body)
+                response.headers["Content-Type"] = "text/html"
+                return response
+        else:
+            # no authcookie 
+            username = 'Guest'
+            #body = make_response(redirect(url_for('logout')))
+            body = render_template('blogLogin.html', UsernameReplace= username)
+            response = make_response(body)
+            response.headers["Content-Type"] = "text/html"
+            return response
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080, debug=True)
