@@ -48,7 +48,6 @@ function checklower(pw){
 function checkspecial(pw){
     var special = document.getElementById('specials');
     var specialChars = /[!@#$%^&*()_+\-\=\[\]{};':"\\|,.<>\/?]/;
-    console.log(pw);
     if(specialChars.test(pw)){
         special.checked = true;
         return true;
