@@ -10,6 +10,7 @@ import os
 import base64
 import requests
 import json
+import magic
 
 
 app = Flask(__name__)
@@ -21,12 +22,9 @@ chat = db['chat']
 id = db['chatid']
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 likes = db['likes']
+profile_picture = db['pic']
+tracker = db['track']
 
-#add a nosniff after all responses
-@app.after_request
-def nosniff(response):
-    response.headers['X-Content-Type-Options'] = 'nosniff'
-    return response
 
 #add a nosniff after all responses
 @app.after_request
@@ -52,6 +50,21 @@ def handle_img(filename):
         response.headers["Content-Type"] = "image/png"
 
 
+    return response
+
+@app.route("/pictures/<filename>", methods=['GET'])
+def prof_picture_rendering(filename):
+    path = 'pictures'
+    type = filename.split('.')[1]
+    filename = filename.replace('/','')
+    if type == 'jpeg':
+        response = make_response(send_from_directory(path, filename),200)
+        response.headers["Content-Type"] = "image/jpeg"
+    elif type == 'png':
+        response = make_response(send_from_directory(path, filename),200)
+        response.headers["Content-Type"] = "image/png"
+    else:
+        return 'invalid profile picture', 400
     return response
 
 
@@ -245,12 +258,10 @@ def logout():
         response.set_cookie('auth_token', '0', httponly=True, max_age=-3600)
         return response
     else:
-        username = 'Guest'
-        body = render_template('blogLogin.html', UsernameReplace= username)
-        response = make_response(body,302)
-        response.headers["Content-Type"] = "text/html"
-        response.set_cookie('auth_token', '0', httponly=True, max_age=-3600)
-        return response
+        body = make_response(redirect(url_for('blogPage')))
+        resp = make_response(body)
+        resp.headers["Content-Type"] = "text/html"
+        return resp
     
 @app.route("/chat/<messageId>", methods=['DELETE'])
 def deletemsg(messageId):
@@ -298,6 +309,57 @@ def updatemsg(messageId):
     response = make_response(jsonify('Not authenticated'), 404)
     return response
 
+@app.route("/uploadProfilePicture", methods=['POST'])
+def upload():
+    authcookie = request.cookies.get('auth_token',None)
+    if(authcookie):
+        haskAuthCookie = hashlib.sha256(authcookie.encode()).hexdigest()
+        authUser = authtoken.find_one({'authtoken_hash' : haskAuthCookie})
+        if authUser:
+            #find the corresponding image increment number
+            user = authUser['email']
+            track = tracker.find_one({'type' : 'image'})
+            if not (track):
+                data = {'type' : 'image', '#': 0}
+                tracker.insert_one(data)
+            track = tracker.find_one({'type' : 'image'})
+            number = int(track['#'])
+            number += 1
+            tracker.update_one({'type' : 'image'}, {'$set': {'#': number}})
+            if 'file-upload' not in request.files:
+                # Handle case where no file was uploaded
+                return str(request.files) + ':'+str(request), 400
+
+            file = request.files['file-upload']
+            #determine the file type
+            determine = magic.Magic(mime=True)
+            type = determine.from_buffer(file.read(1024))
+            file.seek(0)
+            file_type = ''
+            if type in ['image/jpeg', 'image/jpg']:
+                file_type = '.jpeg'
+            elif type in ['image/png']:
+                file_type = '.png'
+            else:
+                response = make_response(jsonify('Invalid file type'), 404)
+                return response
+            filepath = 'pictures/image'+str(number)+file_type
+            check = profile_picture.find_one({'email' : user})
+            data = {'email' : user , 'path':'/'+filepath}
+            if check:
+                profile_picture.update_one({'email': user}, {'$set': {'path': '/'+filepath}})
+            else:
+                profile_picture.insert_one(data)
+            file.save(filepath)
+            body = make_response(redirect(url_for('blogPage')))
+            resp = make_response(body)
+            resp.headers["Content-Type"] = "text/html"
+            return resp 
+    body = make_response(redirect(url_for('blogPage')))
+    resp = make_response(body)
+    resp.headers["Content-Type"] = "text/html"
+    return resp
+
 def getBlogPage():
     #get request
         authcookie = request.cookies.get('auth_token',None)
@@ -307,14 +369,17 @@ def getBlogPage():
             authUser = authtoken.find_one({'authtoken_hash' : haskAuthCookie})
             if authUser:
                 username = authUser['email']
-                body = render_template('blog.html', UsernameReplace= username)
+                picture = profile_picture.find_one({'email':username})
+                body = render_template('blog.html', UsernameReplace= username, image_url = "/static/images/default.png" , image_url2 = "/static/images/default.png")
+                if picture:
+                    path = picture['path']
+                    body = render_template('blog.html', UsernameReplace= username, image_url = path, image_url2 = path)
                 response = make_response(body)
                 response.headers["Content-Type"] = "text/html"
                 return response 
             else:
                 # token did not match
                 username = 'Guest'
-                #body = make_response(redirect(url_for('logout')))
                 body = render_template('blogLogin.html', UsernameReplace= username)
                 response = make_response(body)
                 response.headers["Content-Type"] = "text/html"

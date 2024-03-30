@@ -106,6 +106,3 @@ function chatRequest(){
 setInterval(chatRequest, 4000);
 
 
-
-
-

@@ -24,6 +24,10 @@
     <!-- this is the user information that is displayed on the left side -->
     <div class = "content-container">
         <div class="user-info-container">
+            <label for="file-upload" class="prof-pic-wrapper">
+                <img src="{{ url_for('static', filename='images/default.png') }}" alt="profile picture" class="prof_pic" id="profile-picture">
+                <label for="file-upload" class="upload-button">Edit</label>
+            </label>
             <div class="display-Username">{{UsernameReplace}}</div>
             <div class="counters">
                 <span class="counter-item">Following: {{followingCount}}</span>
@@ -58,4 +62,14 @@
     </div>
 </body>
 <script src="{{ url_for('static', filename='function/function.js') }}"></script> 
+<script>
+    // Get the profile picture element
+    var profilePicture = document.getElementById('profile-picture');
+
+    // Add a click event listener to the profile picture
+    profilePicture.addEventListener('click', function() {
+        // Display an alert when the profile picture is clicked
+        alert('Please login to edit your profile picture.');
+    });
+</script>
 </html>

@@ -18,6 +18,9 @@ body {
     font-weight: bolder;
     color: #007bff;
     font-size: 50px; 
+    cursor: pointer;
+    pointer-events: none; 
+    user-select: none;
 }
 
 .right-content {
@@ -29,16 +32,73 @@ body {
     font-family: 'Manrope', sans-serif;
 }
 .user-info-container {
+    position: relative;
     width: 15%;
     margin-top: 20px;
     background-color: white;
     border-radius: 3%;
-    border-left-style: solid;
-    border: lightblue;
-    border-left-width: 20px;
+    border-left: 20px solid lightblue;
     margin-left: 10px;
     font-family: 'Manrope', sans-serif;
+    overflow: hidden;
 }
+
+.edit-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: transparent; /* Transparent background */
+    color: white;
+    font-size: 14px; 
+    padding: 0;
+    border: none; 
+    cursor: pointer; 
+    display: none; 
+}
+
+.prof_pic {
+    position: relative;
+    display: block;
+    margin: 0 auto;
+    width: 100px; 
+    height: 100px; 
+    border-radius: 50%;
+    object-fit: cover;
+    transition: filter 0.3s ease;
+} 
+
+.user-info-container:hover .prof_pic {
+    filter: brightness(0.8);
+}
+
+.prof-pic-wrapper {
+    display: block;
+    position: relative;
+    margin-bottom: 20px; 
+    cursor: pointer; 
+    margin-top: 10px;
+}
+.upload-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 5px 10px;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+    display: none;
+    color: grey;
+}
+
+.prof-pic-wrapper:hover .upload-button {
+    display: block; 
+}
+
+
+
 .counters {
     display: flex;
     flex-direction: column; /* Change the flex direction to column */
@@ -56,9 +116,11 @@ body {
 .counters span {
     font-weight: bold;
 }
-.display-Username{
-    padding-left: 40%;
-    padding-top: 10%;
+
+.display-Username {
+    position: relative;
+    text-align: center; 
+    padding-top: 10px; 
     font-weight: bold;
 }
 .chat-container {
@@ -210,7 +272,6 @@ body {
 }
 
 .button-style:hover,
-.logout-button:hover,
 .login-button:hover,
 .register-button:hover{
     background: #005A8C; /* Change background color on hover */
@@ -219,7 +280,6 @@ body {
 
 
 .login-button,
-.logout-button,
 .register-button {
     background-color: #007bff;
     color: white;
@@ -234,4 +294,92 @@ body {
     font-family: 'Lexend', sans-serif; 
     font-size: 20px;
     line-height: 1; 
+}
+
+.profile-container {
+    position: relative;
+    display: inline-block;
+    margin-right: 3%;
+    margin-top: 5px;
+}
+
+.profile-circle {
+    position: relative;
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.profile-circle img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.buttons-container {
+    position: absolute;
+    top: 70px; /* Adjust this value according to your design */
+    left: 0;
+    display: none;
+}
+
+.setting-button,
+.signout-button {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.profile-container {
+    position: relative;
+    display: inline-block;
+    margin-right: 3%;
+    margin-top: 5px;
+}
+
+.profile-circle {
+    position: relative;
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.profile-circle img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.dropdown {
+    position: absolute;
+    top: 100%; 
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: none;
+    right: -44%;
+    font-family: Arial, sans-serif;
+}
+
+.dropdown.show {
+    display: block;
+}
+
+.dropdown label {
+    display: block;
+    padding: 8px 10px;
+    cursor: pointer;
+}
+
+.dropdown label:hover {
+    background-color: #f2f2f2;
+}
+
+.hidden {
+    display: none;
 }

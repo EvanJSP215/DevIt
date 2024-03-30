@@ -13,14 +13,33 @@
         <div class="left-content">
             TBD
         </div>
-        <form action="/logout" method="post" enctype="application/x-www-form-urlencoded" class="right-content">
-            <button class = "logout-button"> LogOut </button>
-        </form>
+        <div class="profile-container">
+            <div class="profile-circle" id="profile-circle">
+                <img src="{{image_url2}}" alt="Profile Picture">
+            </div>
+            <div class="dropdown" id="dropdown">
+                <form action="/Settings" method="get" enctype="application/x-www-form-urlencoded" class="right-content">
+                    <label for="settings">Settings</label>
+                    <input type="submit" id="settings" class="hidden">
+                </form>
+                <form action="/logout" method="post" enctype="application/x-www-form-urlencoded" class="right-content">
+                    <label for="logout">Log Out</label>
+                    <input type="submit" id="logout" class="hidden">
+                </form>
+            </div>
+        </div>
     </div>
 
     <!-- this is the user information that is displayed on the left side -->
     <div class = "content-container">
         <div class="user-info-container">
+            <label for="file-upload" class="prof-pic-wrapper">
+                <img src="{{image_url}}" alt="profile picture" class="prof_pic" id="profile-picture">
+                <form action="/uploadProfilePicture" method="post" id="image-form" enctype="multipart/form-data">
+                    <label for="file-upload" class="upload-button">Edit</label>
+                    <input type="file" id="file-upload" name="file-upload" style="display: none;" accept="image/png, image/jpeg" onchange="submitForm()">
+                </form>
+            </label>
             <div class="display-Username">{{UsernameReplace}}</div>
             <div class="counters">
                 <span  class="counter-item">Following: {{followingCount}}</span>
@@ -49,4 +68,5 @@
     </div>
 </body>
 <script src="{{ url_for('static', filename='function/function.js') }}"></script> 
+<script src="{{ url_for('static', filename='function/blog.js') }}"></script> 
 </html>

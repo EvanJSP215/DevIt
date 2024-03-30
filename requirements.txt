@@ -3,3 +3,4 @@ bcrypt
 requests
 flask
 Flask-WTF
+python-magic
