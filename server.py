@@ -350,6 +350,8 @@ def upload():
                 profile_picture.update_one({'email': user}, {'$set': {'path': '/'+filepath}})
             else:
                 profile_picture.insert_one(data)
+            if not os.path.exists('pictures'):
+                os.makedirs('pictures')
             file.save(filepath)
             body = make_response(redirect(url_for('blogPage')))
             resp = make_response(body)
