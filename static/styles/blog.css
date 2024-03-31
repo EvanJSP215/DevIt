@@ -43,19 +43,6 @@ body {
     overflow: hidden;
 }
 
-.edit-button {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: transparent; /* Transparent background */
-    color: white;
-    font-size: 14px; 
-    padding: 0;
-    border: none; 
-    cursor: pointer; 
-    display: none; 
-}
 
 .prof_pic {
     position: relative;
