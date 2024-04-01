@@ -394,6 +394,9 @@ def getBlogPage():
             response = make_response(body)
             response.headers["Content-Type"] = "text/html"
             return response
+@app.route('/profile', methods=['GET', 'POST'])
+def profile():
+    return render_template('Profile.html')
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080, debug=True)
