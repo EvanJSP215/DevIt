@@ -110,7 +110,7 @@ def register():
             response.headers["Content-Type"] = "text/html"
             return response
         email = email.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
-        password = password.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
+        password = password
         hashedpw = bcrypt.hashpw(password.encode(),bcrypt.gensalt())
         csrf = secrets.token_urlsafe(80) 
         user = {"email": email,'password': hashedpw,'csrf':csrf}
@@ -333,8 +333,7 @@ def updatemsg(messageId):
             authUser = authtoken.find_one({'authtoken_hash' : haskAuthCookie})
             if authUser['email'] == find['email']:
                 msg = request.json
-                message = msg.get('message')
-                print(message)
+                message = msg.get('message').replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
                 chat.update_one({'id': messageId}, {'$set': {'message': message}})
                 response = make_response(jsonify('Updated'), 200)
                 return response
