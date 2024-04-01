@@ -38,14 +38,13 @@
 
         <!-- this is the where you post blog/images -->
         <div class="chat-container">
-            <form action="/blogPage" method="post" enctype='application/x-www-form-urlencoded'>
+            <form action="/blogPage" method="post" enctype='multipart/form-data'>
                 <div class="post">
-                    <textarea class= "post-input" type="text" id="message" name="message" placeholder="want to share something? Type it here"></textarea>
-                    <input type="hidden" id="xsrfToken"  name="xsrfToken" value="{{xsrf}}">
-                </br>
-                    <button class="Upload-button">Upload</button>
+                    <textarea class="post-input" type="text" id="message" name="message" placeholder="Want to share something? Type it here"></textarea>
+                    <input type="hidden" id="xsrfToken" name="xsrfToken" value="{{xsrf}}">
+                    <br>
                     <button class="publish-button" type="submit">Publish</button>
-                </div>  
+                </div>
             </form>
             
             <!-- this is the display part -->

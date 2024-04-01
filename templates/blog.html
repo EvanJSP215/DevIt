@@ -50,15 +50,17 @@
 
         <!-- this is the where you post blog/images -->
         <div class="chat-container">
-            <form action="/blogPage" method="post" enctype='application/x-www-form-urlencoded'>
+            <form action="/blogPage" method="post" enctype='multipart/form-data'>
                 <div class="post">
-                    <textarea class= "post-input" type="text" id="message" name="message" placeholder="want to share something? Type it here"></textarea>
-                    <input type="hidden" id="xsrfToken"  name="xsrfToken" value="{{xsrf}}">
-                </br>
-                    <button class="Upload-button">Upload</button>
+                    <textarea class="post-input" type="text" id="message" name="message" placeholder="Want to share something? Type it here"></textarea>
+                    <label for="image-upload" class="Upload-button">Upload</label>
+                    <input type="file" id="image-upload" name="image-upload" style="display: none;">
+                    <input type="hidden" id="xsrfToken" name="xsrfToken" value="{{xsrf}}">
+                    <br>
                     <button class="publish-button" type="submit">Publish</button>
-                </div>  
+                </div>
             </form>
+            
             
             <!-- this is the display part -->
             <div class="published-post">
@@ -67,6 +69,11 @@
         </div>
     </div>
 </body>
+{% if error_message %}
+    <script>
+        alert('{{ error_message }}');
+    </script>
+{% endif %}
 <script src="{{ url_for('static', filename='function/function.js') }}"></script> 
 <script src="{{ url_for('static', filename='function/blog.js') }}"></script> 
 </html>

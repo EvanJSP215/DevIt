@@ -63,8 +63,11 @@ def prof_picture_rendering(filename):
     elif type == 'png':
         response = make_response(send_from_directory(path, filename),200)
         response.headers["Content-Type"] = "image/png"
+    elif type == 'gif':
+        response = make_response(send_from_directory(path, filename),200)
+        response.headers["Content-Type"] = "image/gif"
     else:
-        return 'invalid profile picture', 400
+        return 'invalid picture', 400
     return response
 
 
@@ -168,12 +171,11 @@ def blogPage():
     if request.method == 'POST':
         message = request.form.get("message",None)
         authcookie = request.cookies.get('auth_token',None)
-        if message != None:
-            message = message.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
-        else:
-            message = "none"
+        
+        imageFile = request.files.get("image-upload",None)
+        print(imageFile)
         uid = id.find_one({})
-        chatId = None
+        chatId = '0'
         if uid:
             chatId = uid['id']
             chatId = int(chatId) + 1
@@ -182,6 +184,34 @@ def blogPage():
             id.insert_one({'id' : "0"})
             chatId = id.find_one({})
             chatId = chatId['id']
+        
+        imagePath = ''
+        if imageFile:
+            determine = magic.Magic(mime=True)
+            mimetype = determine.from_buffer(imageFile.read(1024))
+            imageFile.seek(0)
+            fileExtension = ''
+            if mimetype in ['image/jpeg', 'image/jpg']:
+                fileExtension = '.jpeg'
+            elif mimetype == 'image/png':
+                fileExtension = '.png'
+            elif mimetype == 'image/gif':
+                fileExtension = '.gif'
+            else:
+                uploadFail = 'Invalid image file format. Only JPG, JPEG, PNG, and GIF are allowed.'
+                return render_template('uploadFail.html')
+                # return redirect(url_for('blogPage', uploadFail=uploadFail))
+            
+            imagePath = './pictures/image' + str(chatId) + fileExtension
+            if not os.path.exists('pictures'):
+                os.makedirs('pictures')
+            imageFile.save(imagePath)
+            
+        if message != None:
+            message = message.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
+        else:
+            message = "none"
+            
         if authcookie != None:
             haskAuthCookie = hashlib.sha256(authcookie.encode()).hexdigest()
             authUser = authtoken.find_one({'authtoken_hash' : haskAuthCookie})
@@ -194,10 +224,9 @@ def blogPage():
             # no auth cookie
             email = 'Guest'
         
-        blogData = {'message': message, 'email': email, 'id': str(chatId), 'likeCount' : "0" , 'status': 'Active'}
+        blogData = {'message': message, 'email': email, 'id': str(chatId), 'likeCount' : "0" , 'status': 'Active', 'imagePath': imagePath}
         chat.insert_one(blogData)
         return getBlogPage()
-              
     else:
         return getBlogPage()
         
@@ -237,7 +266,7 @@ def chatm():
         result['likeCount'] = str(like_count)
         if email == result['email']:
             edit = 'True'
-        dic = {'message': result['message'], 'username': result['email'], 'id': result['id'], 'likeCount' : result['likeCount'], 'edit_permission': edit}
+        dic = {'message': result['message'], 'username': result['email'], 'id': result['id'], 'likeCount' : result['likeCount'], 'edit_permission': edit, 'imagePath' : result['imagePath']}
         arr.append(dic)
     jsonStr = json.dumps(arr)
     body = jsonStr
@@ -253,16 +282,25 @@ def logout():
         authtoken.delete_one({'authtoken_hash' : haskAuthCookie})
         username = 'Guest'
         body = render_template('blogLogin.html', UsernameReplace= username)
+        body = make_response(redirect(url_for('blogLogin')))
         response = make_response(body,302)
         response.headers["Content-Type"] = "text/html"
         response.set_cookie('auth_token', '0', httponly=True, max_age=-3600)
         return response
     else:
-        body = make_response(redirect(url_for('blogPage')))
+        body = make_response(redirect(url_for('blogLogin')))
         resp = make_response(body)
         resp.headers["Content-Type"] = "text/html"
         return resp
     
+@app.route('/blogLogin', methods=['GET'])
+def blogLogin():
+    username = 'Guest'
+    response = make_response(render_template('blogLogin.html', UsernameReplace=username))
+    response.headers["Content-Type"] = "text/html"
+    response.set_cookie('auth_token', '0', httponly=True, max_age=-3600)
+    return response
+
 @app.route("/chat/<messageId>", methods=['DELETE'])
 def deletemsg(messageId):
     authcookie = request.cookies.get('auth_token',None)
@@ -340,6 +378,8 @@ def upload():
                 file_type = '.jpeg'
             elif type in ['image/png']:
                 file_type = '.png'
+            elif type == 'image/gif':
+                file_type = '.gif'
             else:
                 response = make_response(jsonify('Invalid file type'), 404)
                 return response

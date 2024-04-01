@@ -8,6 +8,13 @@ function addMessage(messageJSON) {
                             <div class='username'>${messageJSON.username}</div>
                             <div id='msg_${messageJSON.id}' class='content'>${messageJSON.message}</div>
                             <button onclick="likePost('${messageJSON.id}')" class='like-button'>👍 ${messageJSON.likeCount}</button>`;
+    if (messageJSON.imagePath !== ''){
+       messageHTML =  `<div class='chat-message' value=${messageJSON.id}>
+                            <div class='username'>${messageJSON.username}</div>
+                            <div id='msg_${messageJSON.id}' class='content'>${messageJSON.message}</div>
+                            <span id='message_${messageJSON.id}'><img class= 'blog-image' src="${messageJSON.imagePath}"></span><br>
+                            <button onclick="likePost('${messageJSON.id}')" class='like-button'>👍 ${messageJSON.likeCount}</button>`;
+    }                        
     if (messageJSON.edit_permission === 'True'){
         messageHTML += `<button class='delete-button' onclick='deleteMessage("${messageJSON.id}")'>Delete</button>
                         <button id='button_${messageJSON.id}' class='edit-button' onclick='updateMessage("${messageJSON.id}")'>Edit</button>`;
