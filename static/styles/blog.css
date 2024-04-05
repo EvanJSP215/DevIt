@@ -131,6 +131,7 @@ body {
 .username {
     font-weight: bold;
     background-color: white;
+    float: left;
 }
 .post-input[type="text"] {
     width: 90%;
@@ -188,7 +189,7 @@ body {
     align-self: flex-end; 
     font-weight: bold;
     margin-top: -25.7px;
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.458); 
+    /*box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.458); */
     border-radius: 5px;
     margin-left: 5px;
 }
@@ -203,7 +204,7 @@ body {
     margin-top: 30px;
     align-self: flex-start;
     margin-left: 540px;
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.458); 
+    /*box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.458); */
     border-radius: 5px;
 }
 
@@ -212,38 +213,11 @@ body {
 .Upload-button:hover,
 .publish-button:hover{
     background: #005A8C; 
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    /*box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);*/
 }
 
-.published-post{
-    display: "none";
-    width: 0px;
-    height: 0px;
-}
-.chat-message {
-    border: 1px solid #ddd;
-    padding: 10px;
-    margin-top: 20px;
-    background-color: white;
-    margin-left: -200px;
-    margin-right: -520px;
-    border-radius: 3%;
-    max-height: auto; 
-    overflow-y: auto; 
-    position: relative;
-}
 
-.blog-image {
-    width: 400px;
-    height: 300px;
-}
 
-.content {
-    margin-top: 10px;
-    background-color: white;
-    border-radius: 3%;
-    font-size: 16px; 
-}
 .icons {
     display: flex;
     justify-content: flex-end;
@@ -373,4 +347,54 @@ body {
 
 .hidden {
     display: none;
+}
+
+
+.blog-picture-container {
+    position: relative;
+    display: flex;
+}
+
+.blog-circle {
+    position: relative;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+    float: left;
+}
+
+
+.published-post{
+    display: "none";
+    width: 0px;
+    height: 0px;
+}
+.chat-message {
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin-top: 20px;
+    background-color: white;
+    margin-left: -200px;
+    margin-right: -520px;
+    border-radius: 3%;
+    max-height: auto; 
+    overflow-y: auto; 
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.content {
+    margin-top: 10px;
+    background-color: white;
+    border-radius: 3%;
+    font-size: 16px; 
+    margin-right: 10px;
+}
+
+.blog-image {
+    width: 400px;
+    height: 300px;
 }

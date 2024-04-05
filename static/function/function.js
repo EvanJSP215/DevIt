@@ -5,7 +5,12 @@
 function addMessage(messageJSON) {
     const chatMessages = document.getElementById("chatMessage");
     let messageHTML = `<div class='chat-message' value=${messageJSON.id}>
-                            <div class='username'>${messageJSON.username}</div>
+                            <div class=".blog-picture-container">
+                                <div class="blog-circle" id="blog-circle">
+                                    <img src=${messageJSON.profile_picture}  alt="Profile Picture" >
+                                </div>
+                                <div class='username'>${messageJSON.username}</div>
+                            </div>
                             <div id='msg_${messageJSON.id}' class='content'>${messageJSON.message}</div>
                             <button onclick="likePost('${messageJSON.id}')" class='like-button'>👍 ${messageJSON.likeCount}</button>`;
     if (messageJSON.imagePath !== ''){

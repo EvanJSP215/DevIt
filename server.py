@@ -211,7 +211,6 @@ def blogPage():
             message = message.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
         else:
             message = "none"
-            
         if authcookie != None:
             haskAuthCookie = hashlib.sha256(authcookie.encode()).hexdigest()
             authUser = authtoken.find_one({'authtoken_hash' : haskAuthCookie})
@@ -255,18 +254,23 @@ def chatm():
     arr =[]
     authcookie = request.cookies.get('auth_token',None)
     email = 'None'
+    ppicture = '/static/images/default.png'
     if authcookie:
         hashAuthCookie = hashlib.sha256(authcookie.encode()).hexdigest()
         authUser = authtoken.find_one({'authtoken_hash' : hashAuthCookie})
         if authUser:
             email = authUser['email']
+            check_profile = authtoken.find_one({'email' : email})
+            if check_profile:
+                ppicture = check_profile['path']
+
     for result in chatData:
         edit = 'False'
         like_count = likes.count_documents({'messageId': result['id']})
         result['likeCount'] = str(like_count)
         if email == result['email']:
             edit = 'True'
-        dic = {'message': result['message'], 'username': result['email'], 'id': result['id'], 'likeCount' : result['likeCount'], 'edit_permission': edit, 'imagePath' : result['imagePath']}
+        dic = {'message': result['message'], 'username': result['email'], 'id': result['id'], 'likeCount' : result['likeCount'], 'edit_permission': edit, 'imagePath' : result['imagePath'], 'profile_picture': ppicture}
         arr.append(dic)
     jsonStr = json.dumps(arr)
     body = jsonStr
