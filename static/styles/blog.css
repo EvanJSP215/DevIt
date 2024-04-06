@@ -1,5 +1,5 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Manrope', sans-serif;
     background: linear-gradient(to right, lightblue, #ffffff);
     margin-top: 0px; 
     margin-right: 0px; 
@@ -31,16 +31,19 @@ body {
     display: flex;
     font-family: 'Manrope', sans-serif;
 }
+
+
 .user-info-container {
     position: relative;
     width: 15%;
     margin-top: 20px;
     background-color: white;
-    border-radius: 3%;
+    border-radius: 15px;
     border-left: 20px solid lightblue;
     margin-left: 10px;
     font-family: 'Manrope', sans-serif;
     overflow: hidden;
+    max-height: 500px;
 }
 
 .prof_pic {
@@ -65,6 +68,7 @@ body {
     cursor: pointer; 
     margin-top: 10px;
 }
+
 .upload-button {
     position: absolute;
     top: 50%;
@@ -82,8 +86,6 @@ body {
 .prof-pic-wrapper:hover .upload-button {
     display: block; 
 }
-
-
 
 .counters {
     display: flex;
@@ -116,7 +118,7 @@ body {
 }
 
 .post {
-    border-radius: 10px;
+    border-radius: 0.75rem;
     border: 1px solid #ddd;
     padding: 10px;
     margin-bottom: 20px;
@@ -126,13 +128,9 @@ body {
     margin-left: -200px;
     width: 700px;
     height: 200px;
+    position: relative;
+}
 
-}
-.username {
-    font-weight: bold;
-    background-color: white;
-    float: left;
-}
 .post-input[type="text"] {
     width: 90%;
     padding-left: 7px;
@@ -154,19 +152,28 @@ body {
     resize: none;
 }
 
+.button-container {
+    display: flex;
+    justify-content: flex-end; 
+    position: absolute;
+    bottom: 10px; 
+    right: 10px; 
+}
+
 .Upload-button{
     background-color: #2d8ff7;
     color: #fff;
     border: none;
     padding: 5px 10px;
     cursor: pointer;
+    align-self: flex-end; 
     font-weight: bold;
     margin-top: -25.7px;
-    align-self: flex-start;
-    margin-left: 540px;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.458); 
     border-radius: 5px;
+    margin-right: 10px;
 }
+
 .publish-button {
     background-color: #2d8ff7;
     color: #fff;
@@ -180,34 +187,8 @@ body {
     border-radius: 5px;
 }
 
-.edit-button{
-    background-color: #2d8ff7;
-    color: #fff;
-    border: none;
-    padding: 5px 5px;
-    cursor: pointer;
-    align-self: flex-end; 
-    font-weight: bold;
-    margin-top: -25.7px;
-    /*box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.458); */
-    border-radius: 5px;
-    margin-left: 5px;
-}
 
-.delete-button{
-    background-color: #2d8ff7;
-    color: #fff;
-    border: none;
-    padding: 5px 5px;
-    cursor: pointer;
-    font-weight: bold;
-    margin-top: 30px;
-    align-self: flex-start;
-    margin-left: 540px;
-    /*box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.458); */
-    border-radius: 5px;
-}
-
+.like-button:hover,
 .delete-button:hover,
 .edit-button:hover,
 .Upload-button:hover,
@@ -226,21 +207,14 @@ body {
 .icons span {
     margin-right: 10px;
 }
-.content{
-    background-color: #ffffff;
-}
-.like-button{
-    margin-right: 5px;
-    margin-bottom: 3px;
-    background-color: white;
-    border: none;
-}
+
+
 
 .button-style:hover,
 .login-button:hover,
 .register-button:hover{
-    background: #005A8C; /* Change background color on hover */
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25); /* Change box shadow on hover */
+    background: #005A8C;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25); 
 }
 
 
@@ -256,7 +230,7 @@ body {
     width: 150px; 
     cursor: pointer;
     border-radius: 8px;
-    font-family: 'Lexend', sans-serif; 
+    font-family: 'Manrope', sans-serif;
     font-size: 20px;
     line-height: 1; 
 }
@@ -349,52 +323,67 @@ body {
     display: none;
 }
 
-
 .blog-picture-container {
-    position: relative;
     display: flex;
+    align-items: center; 
+    justify-content: center; 
+    
 }
 
 .blog-circle {
-    position: relative;
     width: 30px;
     height: 30px;
     border-radius: 50%;
     overflow: hidden;
     cursor: pointer;
+    margin-right: 10px; 
     float: left;
 }
 
-
-.published-post{
-    display: "none";
-    width: 0px;
-    height: 0px;
+.username {
+    font-weight: bold;
+    float: left;
 }
+
 .chat-message {
     border: 1px solid #ddd;
     padding: 20px;
     margin-top: 20px;
     background-color: white;
-    margin-left: -200px;
-    margin-right: -520px;
-    border-radius: 3%;
-    max-height: auto; 
-    overflow-y: auto; 
+    border-radius: 0.75rem;
+    max-width: 700px;
     position: relative;
     display: flex;
-    align-items: center;
+    flex-direction: column; 
+    margin-left: -200px;
+    margin-right: -520px;
+    font-family: 'Manrope', sans-serif;
+
 }
 
 .content {
     margin-top: 10px;
-    background-color: white;
-    border-radius: 3%;
-    font-size: 16px; 
-    margin-right: 10px;
+    word-wrap: break-word; 
+    text-indent: 10px;
 }
 
-.blog-image {
-    width: 400px;
-    height: 300px;
+.like-button,
+.delete-button,
+.edit-button {
+    background-color: #2d8ff7;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 5px;
+    margin-top: 40px; 
 }
+
+.blog-buttons-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: auto;
+}
+
+

@@ -243,7 +243,8 @@ def like_post(messageId):
 
     already_liked = likes.find_one({'messageId': messageId, 'email': user['email']})
     if already_liked:
-        return jsonify({'error': 'You have already liked this post'}), 400
+        likes.delete_one({'messageId': messageId, 'email': user['email']})
+        return jsonify({'message': 'Unliked'}), 200
 
     likes.insert_one({'messageId': messageId, 'email': user['email']})
     return jsonify({'message': 'Like added successfully'}), 200
@@ -254,13 +255,12 @@ def chatm():
     arr =[]
     authcookie = request.cookies.get('auth_token',None)
     email = 'None'
-    ppicture = '/static/images/default.png'
     if authcookie:
         hashAuthCookie = hashlib.sha256(authcookie.encode()).hexdigest()
         authUser = authtoken.find_one({'authtoken_hash' : hashAuthCookie})
         if authUser:
             email = authUser['email']
-            check_profile = authtoken.find_one({'email' : email})
+            check_profile = profile_picture.find_one({'email' : email})
             if check_profile:
                 ppicture = check_profile['path']
 
@@ -268,8 +268,12 @@ def chatm():
         edit = 'False'
         like_count = likes.count_documents({'messageId': result['id']})
         result['likeCount'] = str(like_count)
+        ppicture = '/static/images/default.png'
         if email == result['email']:
             edit = 'True'
+        check_profile = profile_picture.find_one({'email' : result['email']})
+        if check_profile:
+            ppicture = check_profile['path']
         dic = {'message': result['message'], 'username': result['email'], 'id': result['id'], 'likeCount' : result['likeCount'], 'edit_permission': edit, 'imagePath' : result['imagePath'], 'profile_picture': ppicture}
         arr.append(dic)
     jsonStr = json.dumps(arr)

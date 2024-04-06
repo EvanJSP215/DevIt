@@ -19,11 +19,11 @@
                 <img src="{{image_url2}}" alt="Profile Picture">
             </div>
             <div class="dropdown" id="dropdown">
-                <form action="/Settings" method="get" enctype="application/x-www-form-urlencoded" class="right-content">
+                <form action="/Settings" method="get" enctype="application/x-www-form-urlencoded" class="setting-button">
                     <label for="settings">Settings</label>
                     <input type="submit" id="settings" class="hidden">
                 </form>
-                <form action="/logout" method="post" enctype="application/x-www-form-urlencoded" class="right-content">
+                <form action="/logout" method="post" enctype="application/x-www-form-urlencoded" class="signout-button">
                     <label for="logout">Log Out</label>
                     <input type="submit" id="logout" class="hidden">
                 </form>
@@ -54,11 +54,13 @@
             <form action="/blogPage" method="post" enctype='multipart/form-data'>
                 <div class="post">
                     <textarea class="post-input" type="text" id="message" name="message" placeholder="Want to share something? Type it here"></textarea>
-                    <label for="image-upload" class="Upload-button">Upload</label>
-                    <input type="file" id="image-upload" name="image-upload" style="display: none;">
-                    <input type="hidden" id="xsrfToken" name="xsrfToken" value="{{xsrf}}">
-                    <br>
-                    <button class="publish-button" type="submit">Publish</button>
+                    <div class="button-container">
+                        <label for="image-upload" class="Upload-button">Upload</label>
+                        <input type="file" id="image-upload" name="image-upload" style="display: none;">
+                        <input type="hidden" id="xsrfToken" name="xsrfToken" value="{{xsrf}}">
+                        <br>
+                        <button class="publish-button" type="submit">Publish</button>
+                    </div>
                 </div>
             </form>
             
