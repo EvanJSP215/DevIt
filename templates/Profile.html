@@ -1,27 +1,3 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/upload_profile.css') }}">
-    <title>Upload Profile Picture</title>
-    <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}">
-</head>
-<body>
-
-    <div class="container">
-        <h1>Upload Your Profile Picture</h1>
-
-        <form action="/uploadProfilePic" method="post" enctype="multipart/form-data">
-            <label for="profilePic">Choose a profile picture:</label>
-            <input type="file" id="profilePic" name="profilePic" accept="image/*">
-            <br>
-            <button type="submit" class="button-style">Upload</button>
-        </form>
-    </div>
-
-</body>
-</html> -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -48,12 +24,13 @@
         <h1>User Profile</h1>
 
         <div class="profile-picture-container">
-            <div class="profile-picture" id="profile-picture"></div> <!-- Profile picture circle -->
-            <form action="/uploadProfilePic" method="post" enctype="multipart/form-data" class="upload-form">
-                <label for="profilePic">Choose a profile picture:</label>
-                <input type="file" id="profilePic" name="profilePic" accept="image/*" onchange="previewProfilePicture(event)">
-                <button type="submit" class="button-style">Upload Profile-Picture</button>
-            </form>
+        <div class="profile-picture" id="profile-picture"></div> <!-- Profile picture circle -->
+        <form action="/uploadProfilePicture" method="post" enctype="multipart/form-data" class="upload-form">
+            <label for="profilePic">Choose a profile picture:</label>
+            <input type="file" id="profilePic" name="file-upload" accept="image/png, image/jpeg">
+            <button type="submit" class="button-style">Upload Profile Picture</button>
+        </form>
+        </div>
 
             <form action="/updateUsername" method="post" class="update-username-form">
                 <label for="newUsername">Update Username:</label>
@@ -65,7 +42,7 @@
         
     </div>
 
-    <script>
+    <!-- <script>
         function previewProfilePicture(event) {
             const profilePicture = document.getElementById('profile-picture');
             const file = event.target.files[0];
@@ -81,7 +58,7 @@
                 profilePicture.style.backgroundImage = 'none';
             }
         }
-    </script>
+    </script> -->
 
 </body>
 </html>
