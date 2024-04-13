@@ -6,7 +6,6 @@ function initWS(){
         socket = new WebSocket('ws://' + window.location.host + '/websocket');
 
         socket.onmessage = function(ws_message) {
-            
             /* json format 
                 'messageType': 'blogMessage (or the type you want to add)', 
                 'username': username/email of the sender, 
