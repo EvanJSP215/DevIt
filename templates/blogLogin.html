@@ -9,7 +9,7 @@
     <title>Blog</title>
 </head>
 
-<body>
+<body onload="initWS();">
     <div class="head-container">
         <div class="left-content">
             TBD
@@ -44,7 +44,7 @@
                     <textarea class="post-input" type="text" id="message" name="message" placeholder="Want to share something? Type it here"></textarea>
                     <input type="hidden" id="xsrfToken" name="xsrfToken" value="{{xsrf}}">
                     <br>
-                    <button class="publish-button" type="submit">Publish</button>
+                    <button class="publish-button" onclick="submitPost()">Publish</button>
                 </div>
             </form>
             

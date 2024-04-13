@@ -1,6 +1,67 @@
+const ws = true;
+let socket = null;
 
+function initWS(){
+    if(ws){
+        socket = new WebSocket('ws://' + window.location.host + '/websocket');
 
+        socket.onmessage = function(ws_message) {
+            
+            /* json format 
+                'messageType': 'blogMessage (or the type you want to add)', 
+                'username': username/email of the sender, 
+                'message': html escaped message submitted by user, 
+                'id': id_of_the_message,
+                'likeCount': like count, 
+                'edit_permission': edit, 
+                'imagePath' : image path of post (can be empty if the post does not have an image), 
+                'profile_picture': profile pic path
+            */
+            const data = JSON.parse(ws_message.data);
+            const messageType = data.messageType;
+            if (messageType === 'blogMessage') {
+                addMessage(message);
+            } //to handle more types add message type
+        };
+    }
+}
 
+function submitPost() {
+    const messageInput = document.getElementById('message');
+    const imageInput = document.getElementById('image-upload');
+
+    const message = messageInput.value;
+    const imageFile = imageInput.files[0];
+
+    if (socket.readyState === WebSocket.OPEN) {
+        if (imageFile) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const imageData = event.target.result;
+                const data = {
+                    messageType: 'blogMessage',
+                    message: message,
+                    image: imageData
+                };
+                socket.send(JSON.stringify(data));
+            };
+            reader.readAsDataURL(imageFile);
+        }else{
+            const data = {
+                messageType: 'blogMessage',
+                message: message,
+                image: ''
+            };
+            socket.send(JSON.stringify(data));
+        }
+    }else{
+        console.error('WebSocket connection not open.');
+    }
+
+    // Reset input values after submission
+    messageInput.value = '';
+    imageInput.value = '';
+}
 
 function addMessage(messageJSON) {
     const chatMessages = document.getElementById("chatMessage");
