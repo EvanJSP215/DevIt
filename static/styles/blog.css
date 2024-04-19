@@ -386,4 +386,23 @@ body {
     margin-top: auto;
 }
 
+.profile-button {
+    background-color: #007bff;
+    color: white;
+    text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.556);
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.458); 
+    border: none;
+    margin: 5px;
+    padding: 15px 20px; 
+    cursor: pointer;
+    border-radius: 8px;
+    font-family: 'Manrope', sans-serif;
+    font-size: 20px;
+    line-height: 1; 
+    display: flex; /* Add display flex */
+    align-items: center; /* Center vertically */
+}
 
+.profile-button:hover {
+    background: #005A8C;
+}

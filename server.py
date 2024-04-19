@@ -360,7 +360,24 @@ def updatemsg(messageId):
             return response 
     response = make_response(jsonify('Not authenticated'), 404)
     return response
-
+@app.route("/updateUsername", methods=['POST'])
+def update_username():
+    authcookie = request.cookies.get('auth_token', None)
+    if authcookie:
+        hash_auth_cookie = hashlib.sha256(authcookie.encode()).hexdigest()
+        auth_user = authtoken.find_one({'authtoken_hash': hash_auth_cookie})
+        if auth_user:
+            new_username = request.form.get('newUsername')
+            # Update the username for the logged-in user
+            authtoken.update_one({'email': auth_user['email']}, {'$set': {'email': new_username}})
+            
+            # Redirect to the blogPage with updated username
+            response = make_response(redirect(url_for('blogPage')))
+            return response
+        else:
+            return "User not found"
+    else:
+        return "Unauthorized access"
 @app.route("/uploadProfilePicture", methods=['POST'])
 def upload():
     authcookie = request.cookies.get('auth_token',None)
