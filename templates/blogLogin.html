@@ -6,10 +6,12 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/blog.css') }}">
     <link rel="icon" href= "{{ url_for('static', filename='images/logo.png') }}">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <title>Blog</title>
 </head>
 
-<body onload="initWS();">
+<body>
     <div class="head-container">
         <div class="left-content">
             TBD

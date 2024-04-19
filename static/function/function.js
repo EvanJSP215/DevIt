@@ -1,29 +1,5 @@
-const ws = true;
-let socket = null;
-
-function initWS(){
-    if(ws){
-        socket = new WebSocket('ws://' + window.location.host + '/websocket');
-
-        socket.onmessage = function(ws_message) {
-            /* json format 
-                'messageType': 'blogMessage (or the type you want to add)', 
-                'username': username/email of the sender, 
-                'message': html escaped message submitted by user, 
-                'id': id_of_the_message,
-                'likeCount': like count, 
-                'edit_permission': edit, 
-                'imagePath' : image path of post (can be empty if the post does not have an image), 
-                'profile_picture': profile pic path
-            */
-            const data = JSON.parse(ws_message.data);
-            const messageType = data.messageType;
-            if (messageType === 'blogMessage') {
-                addMessage(message);
-            } //to handle more types add message type
-        };
-    }
-}
+const domain = 'localhost:8080'
+socket = io.connect(`http://${domain}`, {transports: ['websocket']});
 
 function submitPost() {
     const messageInput = document.getElementById('message');
@@ -32,35 +8,40 @@ function submitPost() {
     const message = messageInput.value;
     const imageFile = imageInput.files[0];
 
-    if (socket.readyState === WebSocket.OPEN) {
-        if (imageFile) {
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                const imageData = event.target.result;
-                const data = {
-                    messageType: 'blogMessage',
-                    message: message,
-                    image: imageData
-                };
-                socket.send(JSON.stringify(data));
-            };
-            reader.readAsDataURL(imageFile);
-        }else{
+
+    if (imageFile) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const imageData = event.target.result;
             const data = {
-                messageType: 'blogMessage',
                 message: message,
-                image: ''
+                image: imageData
             };
-            socket.send(JSON.stringify(data));
+            socket.emit('blogMessage',data);
+        };
+        reader.readAsDataURL(imageFile);
         }
-    }else{
-        console.error('WebSocket connection not open.');
-    }
+    else{
+        const data = {
+            message: message,
+            image: ''
+        };
+        socket.emit('blogMessage',data);
+        }
+    
 
     // Reset input values after submission
     messageInput.value = '';
     imageInput.value = '';
 }
+
+socket.on( 'connect', function() {
+    socket.emit( 'my event', {
+      data: 'User Connected'
+    })
+});
+
+//socket.on('blogMessage',addMessage(messageJSON));
 
 function addMessage(messageJSON) {
     const chatMessages = document.getElementById("chatMessage");
@@ -96,6 +77,7 @@ function addMessage(messageJSON) {
     messageHTML += '</div></div>';
     chatMessages.innerHTML += messageHTML;
 }
+
 
 function likePost(messageId) {
     fetch(`/like/${messageId}`, { method: 'POST' })
@@ -184,6 +166,9 @@ function chatRequest(){
     request.send();
 }
 
-setInterval(chatRequest, 4000);
+chatRequest();
+
+
+
 
 
