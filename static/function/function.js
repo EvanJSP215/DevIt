@@ -1,5 +1,4 @@
-const domain = 'localhost:8080'
-socket = io.connect(`http://${domain}`, {transports: ['websocket']});
+const socket = io.connect('http://localhost:8080'); 
 
 function submitPost() {
     const messageInput = document.getElementById('message');
@@ -7,8 +6,7 @@ function submitPost() {
 
     const message = messageInput.value;
     const imageFile = imageInput.files[0];
-
-
+    console.log('Posted');
     if (imageFile) {
         const reader = new FileReader();
         reader.onload = function(event) {
@@ -23,8 +21,7 @@ function submitPost() {
         }
     else{
         const data = {
-            message: message,
-            image: ''
+            message: message
         };
         socket.emit('blogMessage',data);
         }
@@ -35,13 +32,10 @@ function submitPost() {
     imageInput.value = '';
 }
 
-socket.on( 'connect', function() {
-    socket.emit( 'my event', {
-      data: 'User Connected'
-    })
-});
 
-//socket.on('blogMessage',addMessage(messageJSON));
+socket.on('NewMsg',function(data){
+    addMessage(data);
+});
 
 function addMessage(messageJSON) {
     const chatMessages = document.getElementById("chatMessage");
@@ -57,19 +51,19 @@ function addMessage(messageJSON) {
                                 <button onclick="likePost('${messageJSON.id}')" class='like-button'>👍 ${messageJSON.likeCount}</button>
                             `;
     if (messageJSON.imagePath !== ''){
-       messageHTML = `<div class='chat-message' value=${messageJSON.id}>
-                            <div class=".blog-picture-container">
-                                <div class="blog-circle" id="blog-circle">
-                                    <img src=${messageJSON.profile_picture}  alt="Profile Picture" >
+        messageHTML = `<div class='chat-message' value=${messageJSON.id}>
+                                <div class=".blog-picture-container">
+                                    <div class="blog-circle" id="blog-circle">
+                                        <img src=${messageJSON.profile_picture}  alt="Profile Picture" >
+                                    </div>
+                                    <div class='username'>${messageJSON.username}</div>
                                 </div>
-                                <div class='username'>${messageJSON.username}</div>
-                            </div>
-                            <div id='msg_${messageJSON.id}' class='content'>${messageJSON.message}</div>
-                            <span id='message_${messageJSON.id}'><img class= 'blog-image' src="${messageJSON.imagePath}"></span><br>
-                            <div class = "blog-buttons-container"> 
-                                <button onclick="likePost('${messageJSON.id}')" class='like-button'>👍 ${messageJSON.likeCount}</button>
-                            `;
-    }                        
+                                <div id='msg_${messageJSON.id}' class='content'>${messageJSON.message}</div>
+                
+                                <div class = "blog-buttons-container"> 
+                                    <button onclick="likePost('${messageJSON.id}')" class='like-button'>👍 ${messageJSON.likeCount}</button>
+                                `;
+        }                        
     if (messageJSON.edit_permission === 'True'){
         messageHTML += `<button class='delete-button' onclick='deleteMessage("${messageJSON.id}")'>Delete</button>
                         <button id='button_${messageJSON.id}' class='edit-button' onclick='updateMessage("${messageJSON.id}")'>Edit</button>`;

@@ -41,12 +41,14 @@
 
         <!-- this is the where you post blog/images -->
         <div class="chat-container">
-            <form action="/blogPage" method="post" enctype='multipart/form-data'>
+            <form enctype='multipart/form-data'>
                 <div class="post">
                     <textarea class="post-input" type="text" id="message" name="message" placeholder="Want to share something? Type it here"></textarea>
                     <input type="hidden" id="xsrfToken" name="xsrfToken" value="{{xsrf}}">
                     <br>
-                    <button class="publish-button" onclick="submitPost()">Publish</button>
+                    <label for="image-upload" class="Upload-button" style="display: none;">Upload</label>
+                    <input type="file" id="image-upload" name="image-upload" style="display: none;">
+                    <button type="button" class="publish-button" onclick="submitPost()">Publish</button>
                 </div>
             </form>
             

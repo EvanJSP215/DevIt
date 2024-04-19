@@ -173,69 +173,10 @@ def login():
 @app.route('/blogPage', methods=['GET', 'POST'])
 def blogPage():
     if request.method == 'POST':
-        PostMessageHandler(request)
-        return getBlogPage()
+        pass
     else:
         return getBlogPage()
 
-
-def PostMessageHandler(request):
-    message = request.form.get("message",None)
-    authcookie = request.cookies.get('auth_token',None)  
-    imageFile = request.files.get("image-upload",None)
-    print(imageFile)
-    uid = id.find_one({})
-    chatId = '0'
-    if uid:
-        chatId = uid['id']
-        chatId = int(chatId) + 1
-        id.update_one({}, {'$set':{'id' : str(chatId)}})
-    else:
-        id.insert_one({'id' : "0"})
-        chatId = id.find_one({})
-        chatId = chatId['id']
-        
-    imagePath = ''
-    if imageFile:
-        determine = magic.Magic(mime=True)
-        mimetype = determine.from_buffer(imageFile.read(1024))
-        imageFile.seek(0)
-        fileExtension = ''
-        if mimetype in ['image/jpeg', 'image/jpg']:
-            fileExtension = '.jpeg'
-        elif mimetype == 'image/png':
-            fileExtension = '.png'
-        elif mimetype == 'image/gif':
-            fileExtension = '.gif'
-        else:
-            uploadFail = 'Invalid image file format. Only JPG, JPEG, PNG, and GIF are allowed.'
-            return render_template('uploadFail.html')
-            # return redirect(url_for('blogPage', uploadFail=uploadFail))
-            
-        imagePath = './pictures/image' + str(chatId) + fileExtension
-        if not os.path.exists('pictures'):
-            os.makedirs('pictures')
-        imageFile.save(imagePath)
-            
-    if message != None:
-        message = message.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
-    else:
-        message = "none"
-    if authcookie != None:
-        haskAuthCookie = hashlib.sha256(authcookie.encode()).hexdigest()
-        authUser = authtoken.find_one({'authtoken_hash' : haskAuthCookie})
-        if authUser:
-            email = authUser['email']
-        else:
-            # have the authcookie but authtoken does not exist
-            email = 'Guest'
-    else:
-        # no auth cookie
-        email = 'Guest'
-        
-    blogData = {'message': message, 'email': email, 'id': str(chatId), 'likeCount' : "0" , 'status': 'Active', 'imagePath': imagePath}
-    chat.insert_one(blogData)
-    return {'message': blogData['message'],'username':blogData['email'],'id':str(chatId),'likeCount' : blogData['likeCount'],'imagePath': imagePath}
         
 @app.route('/like/<messageId>', methods=['POST'])
 def like_post(messageId):
@@ -473,11 +414,73 @@ def profile():
 
 @socketio.on('blogMessage')
 def handle_message(data):
-    print('Received -----------------------------------------------------')
-    message = PostMessageHandler(data)
-    emit('message', message)
+    auth_token = request.cookies.get('auth_token', None)
+    message = PostMessageHandler(data,auth_token)
+    emit('NewMsg', message, broadcast=True)
+    
+
+
+
+def PostMessageHandler(request,authcookie):
+    message = request.get("message",None)
+    imageFile = request.get("image",None)
+    uid = id.find_one({})
+    chatId = '0'
+    if uid:
+        chatId = uid['id']
+        chatId = int(chatId) + 1
+        id.update_one({}, {'$set':{'id' : str(chatId)}})
+    else:
+        id.insert_one({'id' : "0"})
+        chatId = id.find_one({})
+        chatId = chatId['id']
+        
+    imagePath = ''
+    if imageFile:
+        determine = magic.Magic(mime=True)
+        mimetype = determine.from_buffer(imageFile.read(1024))
+        imageFile.seek(0)
+        fileExtension = ''
+        if mimetype in ['image/jpeg', 'image/jpg']:
+            fileExtension = '.jpeg'
+        elif mimetype == 'image/png':
+            fileExtension = '.png'
+        elif mimetype == 'image/gif':
+            fileExtension = '.gif'
+        else:
+            uploadFail = 'Invalid image file format. Only JPG, JPEG, PNG, and GIF are allowed.'
+            return render_template('uploadFail.html')
+            # return redirect(url_for('blogPage', uploadFail=uploadFail))
+            
+        imagePath = './pictures/image' + str(chatId) + fileExtension
+        if not os.path.exists('pictures'):
+            os.makedirs('pictures')
+        imageFile.save(imagePath)
+            
+    if message != None:
+        message = message.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
+    else:
+        message = "none"
+    if authcookie != None:
+        haskAuthCookie = hashlib.sha256(authcookie.encode()).hexdigest()
+        authUser = authtoken.find_one({'authtoken_hash' : haskAuthCookie})
+        if authUser:
+            email = authUser['email']
+        else:
+            # have the authcookie but authtoken does not exist
+            email = 'Guest'
+    else:
+        # no auth cookie
+        email = 'Guest'
+        
+    blogData = {'message': message, 'email': email, 'id': str(chatId), 'likeCount' : "0" , 'status': 'Active', 'imagePath': imagePath}
+    chat.insert_one(blogData)
+    ppicture = '/static/images/default.png'
+    check_profile = profile_picture.find_one({'email' : email})
+    if check_profile:
+        ppicture = check_profile['path']
+    return {'message': blogData['message'],'username':blogData['email'],'id':str(chatId),'likeCount' : blogData['likeCount'],'imagePath': imagePath,'profile_picture': ppicture, 'edit_permission': 'False'}
 
 
 if __name__ == "__main__":
-    socketio.run(app,host="0.0.0.0", port=8080, debug=True,allow_unsafe_werkzeug=True)
-    #app.run(host="0.0.0.0", port=8080, debug=True)
+    socketio.run(app, host="0.0.0.0", port=8080, debug=True,allow_unsafe_werkzeug=True)
