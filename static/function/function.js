@@ -61,7 +61,7 @@ function addMessage(messageJSON) {
                                 <div id='msg_${messageJSON.id}' class='content'>${messageJSON.message}</div>
                 
                                 <div class = "blog-buttons-container"> 
-                                    <button onclick="likePost('${messageJSON.id}')" class='like-button'>👍 ${messageJSON.likeCount}</button>
+                                    <button id=Likebutton_${messageJSON.id} class="like-button" onclick="likePost('${messageJSON.id}')">👍 ${messageJSON.likeCount}</button>
                                 `;
         }                        
     if (messageJSON.edit_permission === 'True'){
@@ -69,23 +69,27 @@ function addMessage(messageJSON) {
                         <button id='button_${messageJSON.id}' class='edit-button' onclick='updateMessage("${messageJSON.id}")'>Edit</button>`;
     }
     messageHTML += '</div></div>';
-    chatMessages.innerHTML += messageHTML;
+    chatMessages.innerHTML = messageHTML + chatMessages.innerHTML;
 }
 
 
 function likePost(messageId) {
-    fetch(`/like/${messageId}`, { method: 'POST' })
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                alert(data.error);
-            } else {
-                chatRequest(); // Call chatRequest to refresh the messages and their like counts
-            }
-        })
-        .catch(error => console.error('Error liking the post:', error));
+    const data = {
+            message_id: messageId,
+    };
+    socket.emit('Like_Post',data);
 }
 
+socket.on('Like_Post',function(data){
+    if (data.auth == 'error'){
+        alert('Log in is required to like the post');
+        return;
+    }
+    Likebutton = document.getElementById('Likebutton_'+data.message_id);
+    console.log('Likebutton_'+data.message_id);
+    Likebutton.innerHTML = '👍 '+data.likeCount;
+    
+});
 
 function clearChat() {
     const chatMessages = document.getElementById("chatMessage");
@@ -151,7 +155,7 @@ function chatRequest(){
         if (this.readyState === 4 && this.status === 200) {
             const messages = JSON.parse(this.response);
             clearChat();
-            for (const message of messages.reverse()) {
+            for (const message of messages) {
                 addMessage(message);
             }
         }

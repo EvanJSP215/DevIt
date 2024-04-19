@@ -17,17 +17,12 @@
         <div class="left-content">
             TBD
         </div>
-        <div class="navbar">
-            <form action="/profile" method="get" enctype="application/x-www-form-urlencoded">
-                <button type="submit" class="profile-button">Profile</button>
-            </form>
-        </div>
         <div class="profile-container">
             <div class="profile-circle" id="profile-circle">
                 <img src="{{image_url2}}" alt="Profile Picture">
             </div>
             <div class="dropdown" id="dropdown">
-                <form action="/Settings" method="get" enctype="application/x-www-form-urlencoded" class="setting-button">
+                <form action="/profile" method="get" enctype="application/x-www-form-urlencoded">
                     <label for="settings">Settings</label>
                     <input type="submit" id="settings" class="hidden">
                 </form>
@@ -61,7 +56,7 @@
 
         <!-- this is the where you post blog/images -->
         <div class="chat-container">
-            <form action="/blogPage" method="post" enctype='multipart/form-data'>
+            <form enctype='multipart/form-data'>
                 <div class="post">
                     <textarea class="post-input" type="text" id="message" name="message" placeholder="Want to share something? Type it here"></textarea>
                     <div class="button-container">
@@ -69,7 +64,7 @@
                         <input type="file" id="image-upload" name="image-upload" style="display: none;">
                         <input type="hidden" id="xsrfToken" name="xsrfToken" value="{{xsrf}}">
                         <br>
-                        <button class="publish-button" onclick="submitPost()">Publish</button>
+                        <button type="button" class="publish-button" onclick="submitPost()">Publish</button>
                     </div>
                 </div>
             </form>

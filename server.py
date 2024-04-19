@@ -28,6 +28,7 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 likes = db['likes']
 profile_picture = db['pic']
 tracker = db['track']
+user_lists = {}
 
 
 #add a nosniff after all responses
@@ -170,32 +171,11 @@ def login():
     return response
 
 
-@app.route('/blogPage', methods=['GET', 'POST'])
+@app.route('/blogPage', methods=['GET'])
 def blogPage():
-    if request.method == 'POST':
-        pass
-    else:
-        return getBlogPage()
+    
+    return getBlogPage()
 
-        
-@app.route('/like/<messageId>', methods=['POST'])
-def like_post(messageId):
-    authcookie = request.cookies.get('auth_token', None)
-    if not authcookie:
-        return jsonify({'error': 'Authentication required'}), 401
-
-    hashAuthCookie = hashlib.sha256(authcookie.encode()).hexdigest()
-    user = authtoken.find_one({'authtoken_hash': hashAuthCookie})
-    if not user:
-        return jsonify({'error': 'User not authenticated'}), 403
-
-    already_liked = likes.find_one({'messageId': messageId, 'email': user['email']})
-    if already_liked:
-        likes.delete_one({'messageId': messageId, 'email': user['email']})
-        return jsonify({'message': 'Unliked'}), 200
-
-    likes.insert_one({'messageId': messageId, 'email': user['email']})
-    return jsonify({'message': 'Like added successfully'}), 200
 
 @app.route('/chat', methods=['GET'])
 def chatm():
@@ -416,8 +396,73 @@ def profile():
 def handle_message(data):
     auth_token = request.cookies.get('auth_token', None)
     message = PostMessageHandler(data,auth_token)
-    emit('NewMsg', message, broadcast=True)
+    user = message.get('username',None)
+    if request.sid == user_lists.get(user,None):
+        message['edit_permission'] = 'True'
+        emit('NewMsg', message)
+    message['edit_permission'] = 'False'
+    emit('NewMsg', message, broadcast=True,include_self=False)
+
+
+@socketio.on('connect')
+def handle_connect():
+    auth_token = request.cookies.get('auth_token', None)
+    if auth_token != None:
+        haskAuthCookie = hashlib.sha256(auth_token.encode()).hexdigest()
+        authUser = authtoken.find_one({'authtoken_hash' : haskAuthCookie})
+        if authUser:
+            email = authUser['email']
+            user_lists[email] = request.sid
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    auth_token = request.cookies.get('auth_token', None)
+    if auth_token != None:
+        haskAuthCookie = hashlib.sha256(auth_token.encode()).hexdigest()
+        authUser = authtoken.find_one({'authtoken_hash' : haskAuthCookie})
+        if authUser:
+            email = authUser['email']
+            user_lists.pop(email)
+
+@socketio.on('Like_Post')
+def like_post(data):
+    messageId = data.get('message_id')
+    authcookie = request.cookies.get('auth_token', None)
+    if not authcookie:
+        message = {}
+        message['auth'] = 'error'
+        emit('Like_Post', message)
+        return
+
+    hashAuthCookie = hashlib.sha256(authcookie.encode()).hexdigest()
+    user = authtoken.find_one({'authtoken_hash': hashAuthCookie})
+    if not user:
+        message = {}
+        message['auth'] = 'error'
+        emit('Like_Post', message)
+        return
+
+    already_liked = likes.find_one({'messageId': messageId, 'email': user['email']})
+    if already_liked:
+        likes.delete_one({'messageId': messageId, 'email': user['email']})
+        like_count = likes.count_documents({'messageId': data.get('message_id')})
+        message = {}
+        message['auth'] = 'correct'
+        message['likeCount'] = str(like_count)
+        message['message_id'] = messageId
+        emit('Like_Post', message, broadcast=True)
+        return
     
+    likes.insert_one({'messageId': messageId, 'email': user['email']})
+    like_count = likes.count_documents({'messageId': data.get('message_id')})
+    message = {}
+    message['auth'] = 'correct'
+    message['likeCount'] = str(like_count)
+    message['message_id'] = messageId
+    emit('Like_Post', message, broadcast=True)
+    return 
+
+
 
 
 
