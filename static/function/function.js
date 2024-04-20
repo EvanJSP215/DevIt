@@ -5,9 +5,10 @@ function submitPost() {
     const imageInput = document.getElementById('image-upload');
 
     const message = messageInput.value;
-    const imageFile = imageInput.files[0];
+    const imageFiles = imageInput.files;
     console.log('Posted');
-    if (imageFile) {
+    if (imageFiles && imageFiles.length > 0) {
+        const imageFile = imageFiles[0];
         const reader = new FileReader();
         reader.onload = function(event) {
             const imageData = event.target.result;
@@ -38,8 +39,9 @@ socket.on('NewMsg',function(data){
 });
 
 function addMessage(messageJSON) {
+    console.log(messageJSON);
     const chatMessages = document.getElementById("chatMessage");
-    let messageHTML = `<div class='chat-message' value=${messageJSON.id}>
+    let messageHTML = `<div class='chat-message' id="Message_${messageJSON.id}">
                             <div class=".blog-picture-container">
                                 <div class="blog-circle" id="blog-circle">
                                     <img src=${messageJSON.profile_picture}  alt="Profile Picture" >
@@ -48,10 +50,10 @@ function addMessage(messageJSON) {
                             </div>
                             <div id='msg_${messageJSON.id}' class='content'>${messageJSON.message}</div>
                             <div class = "blog-buttons-container"> 
-                                <button onclick="likePost('${messageJSON.id}')" class='like-button'>👍 ${messageJSON.likeCount}</button>
+                                <button id="Likebutton_${messageJSON.id}" onclick="likePost('${messageJSON.id}')" class='like-button'>👍 ${messageJSON.likeCount}</button>
                             `;
     if (messageJSON.imagePath !== ''){
-        messageHTML = `<div class='chat-message' value=${messageJSON.id}>
+        messageHTML = `<div class='chat-message' id="Message_${messageJSON.id}">
                                 <div class=".blog-picture-container">
                                     <div class="blog-circle" id="blog-circle">
                                         <img src=${messageJSON.profile_picture}  alt="Profile Picture" >
@@ -59,9 +61,10 @@ function addMessage(messageJSON) {
                                     <div class='username'>${messageJSON.username}</div>
                                 </div>
                                 <div id='msg_${messageJSON.id}' class='content'>${messageJSON.message}</div>
-                
+                                <span id='message_${messageJSON.id}'><img class= 'blog-image' src="${messageJSON.imagePath}"></span><br>
                                 <div class = "blog-buttons-container"> 
-                                    <button id=Likebutton_${messageJSON.id} class="like-button" onclick="likePost('${messageJSON.id}')">👍 ${messageJSON.likeCount}</button>
+                                    <button id="Likebutton_${messageJSON.id}" class="like-button" onclick="likePost('${messageJSON.id}')">👍 ${messageJSON.likeCount}</button>
+
                                 `;
         }                        
     if (messageJSON.edit_permission === 'True'){
@@ -97,15 +100,16 @@ function clearChat() {
 }
 
 function deleteMessage(messageId){
-    const delete_request = new XMLHttpRequest();
-    delete_request.onreadystatechange = function () {
-        if (this.readyState === 4 && this.status === 200) {
-            console.log(this.response);
-        }
-    }
-    delete_request.open("DELETE", "/chat/" + messageId);
-    delete_request.send();
+    const data = {
+        message_id: messageId,
+    };
+    socket.emit('Delete_Post',data);
 }
+
+socket.on('Delete_Post',function(data){
+    Message = document.getElementById('Message_'+data.message_id);
+    Message.remove();
+});
 
 function updateMessage(messageId) {
     const message = document.getElementById('msg_' + messageId);
@@ -122,16 +126,14 @@ function updateMessage(messageId) {
         update.classList.add('edit-button');
         update.id = 'button_' + messageId;
         update.onclick = function(){
-            const update_request = new XMLHttpRequest();
-            update_request.onreadystatechange = function () {
-            if (this.readyState === 4 && this.status === 200) {
-                    console.log(this.response);}
-            }
             const box = document.getElementById('msg_' + messageId);
-            update_request.open("PUT", "/chat/" + messageId);
             const message = box.value;
-            update_request.setRequestHeader("Content-Type", "application/json");
-            update_request.send(JSON.stringify({ "message": message }));
+            const data = {
+                message_id: messageId,
+                update_message: message
+            };
+            socket.emit('Update_Post',data);
+
             const text = document.createElement('div');
             text.id = 'msg_' + messageId;
             text.classList.add('content');
@@ -140,14 +142,21 @@ function updateMessage(messageId) {
             const editbutton = document.createElement('button');
             editbutton.textContent = 'Edit';
             editbutton.classList.add('edit-button');
-            editbutton = 'button_' + messageId;
-            editbutton.onclick = "updateMessage(" + messageId + ")"
+            editbutton.id = 'button_' + messageId;
+            editbutton.onclick = function() {
+                updateMessage(messageId);
+            };
             updatebutton.replaceWith(editbutton)
         }
         edit.replaceWith(update);
         };
         
     }
+
+socket.on('Update_Post',function(data){
+    Message = document.getElementById('msg_'+data.message_id);
+    Message.innerHTML = data.message;
+});
 
 function chatRequest(){
     const request = new XMLHttpRequest();

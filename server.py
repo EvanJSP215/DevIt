@@ -12,6 +12,7 @@ import requests
 import json
 import magic
 from flask_socketio import SocketIO, emit
+from io import BytesIO
 
 
 app = Flask(__name__)
@@ -237,50 +238,7 @@ def blogLogin():
     response.set_cookie('auth_token', '0', httponly=True, max_age=-3600)
     return response
 
-@app.route("/chat/<messageId>", methods=['DELETE'])
-def deletemsg(messageId):
-    authcookie = request.cookies.get('auth_token',None)
-    if(authcookie):
-        find = chat.find_one({'id': messageId})
-        if(find):
-            haskAuthCookie = hashlib.sha256(authcookie.encode()).hexdigest()
-            authUser = authtoken.find_one({'authtoken_hash' : haskAuthCookie})
-            if authUser['email'] == find['email']:
-                chat.update_one({'id': messageId}, {'$set': {'status': 'Deleted'}})
-                response = make_response(jsonify('Deleted'), 200)
-                
-                return response
-            else:
-                response = make_response(jsonify('Not the actual user'), 404)
-                return response
-        else:
-            response = make_response(jsonify('Message not found'), 204)
-            return response 
-    response = make_response(jsonify('Not authenticated'), 404)
-    return response
 
-@app.route("/chat/<messageId>", methods=['PUT'])
-def updatemsg(messageId):
-    authcookie = request.cookies.get('auth_token',None)
-    if(authcookie):
-        find = chat.find_one({'id': messageId})
-        if(find):
-            haskAuthCookie = hashlib.sha256(authcookie.encode()).hexdigest()
-            authUser = authtoken.find_one({'authtoken_hash' : haskAuthCookie})
-            if authUser['email'] == find['email']:
-                msg = request.json
-                message = msg.get('message').replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
-                chat.update_one({'id': messageId}, {'$set': {'message': message}})
-                response = make_response(jsonify('Updated'), 200)
-                return response
-            else:
-                response = make_response(jsonify('Not the actual user'), 404)
-                return response
-        else:
-            response = make_response(jsonify('Message not found'), 204)
-            return response 
-    response = make_response(jsonify('Not authenticated'), 404)
-    return response
 @app.route("/updateUsername", methods=['POST'])
 def update_username():
     authcookie = request.cookies.get('auth_token', None)
@@ -299,6 +257,7 @@ def update_username():
             return "User not found"
     else:
         return "Unauthorized access"
+    
 @app.route("/uploadProfilePicture", methods=['POST'])
 def upload():
     authcookie = request.cookies.get('auth_token',None)
@@ -400,8 +359,10 @@ def handle_message(data):
     if request.sid == user_lists.get(user,None):
         message['edit_permission'] = 'True'
         emit('NewMsg', message)
+    elif user == 'Guest':
+        emit('NewMsg', message)
     message['edit_permission'] = 'False'
-    emit('NewMsg', message, broadcast=True,include_self=False)
+    emit('NewMsg', message, broadcast=True, include_self=False)
 
 
 @socketio.on('connect')
@@ -462,8 +423,41 @@ def like_post(data):
     emit('Like_Post', message, broadcast=True)
     return 
 
+@socketio.on('Delete_Post')
+def deletemsg(data):
+    messageId = data.get('message_id',None)
+    authcookie = request.cookies.get('auth_token',None)
+    if(authcookie):
+        find = chat.find_one({'id': messageId})
+        if(find):
+            haskAuthCookie = hashlib.sha256(authcookie.encode()).hexdigest()
+            authUser = authtoken.find_one({'authtoken_hash' : haskAuthCookie})
+            if authUser['email'] == find['email']:
+                chat.update_one({'id': messageId}, {'$set': {'status': 'Deleted'}})
+                message = {}
+                message['message_id'] = messageId 
+                emit('Delete_Post', message,broadcast=True)
+                return 
+    return 
 
 
+@socketio.on('Update_Post')
+def updatemsg(data):
+    messageId = data.get('message_id',None)
+    authcookie = request.cookies.get('auth_token',None)
+    if(authcookie):
+        find = chat.find_one({'id': messageId})
+        if(find):
+            haskAuthCookie = hashlib.sha256(authcookie.encode()).hexdigest()
+            authUser = authtoken.find_one({'authtoken_hash' : haskAuthCookie})
+            if authUser['email'] == find['email']:
+                msg = data.get('update_message',None)
+                message = msg.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
+                chat.update_one({'id': messageId}, {'$set': {'message': message}})
+                response = {'message': message,'message_id':messageId}
+                emit('Update_Post', response,broadcast=True)
+                return
+    return 
 
 
 def PostMessageHandler(request,authcookie):
@@ -482,9 +476,9 @@ def PostMessageHandler(request,authcookie):
         
     imagePath = ''
     if imageFile:
-        determine = magic.Magic(mime=True)
-        mimetype = determine.from_buffer(imageFile.read(1024))
-        imageFile.seek(0)
+        type,b64Content = imageFile.split(",", 1)
+        imageFile = base64.b64decode(b64Content)
+        mimetype = type.split(';')[0].split(':')[1] 
         fileExtension = ''
         if mimetype in ['image/jpeg', 'image/jpg']:
             fileExtension = '.jpeg'
@@ -495,12 +489,12 @@ def PostMessageHandler(request,authcookie):
         else:
             uploadFail = 'Invalid image file format. Only JPG, JPEG, PNG, and GIF are allowed.'
             return render_template('uploadFail.html')
-            # return redirect(url_for('blogPage', uploadFail=uploadFail))
             
         imagePath = './pictures/image' + str(chatId) + fileExtension
         if not os.path.exists('pictures'):
             os.makedirs('pictures')
-        imageFile.save(imagePath)
+        with open(imagePath, 'wb') as f:
+            f.write(imageFile)
             
     if message != None:
         message = message.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
