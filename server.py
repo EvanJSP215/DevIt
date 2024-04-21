@@ -17,7 +17,7 @@ from io import BytesIO
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'This is not a Secret!'
-socketio = SocketIO(app)
+socketio = SocketIO(app, cors_allowed_origins='*')
 
 mongo_client = MongoClient("mongo")
 db = mongo_client["TBD"]
@@ -522,4 +522,4 @@ def PostMessageHandler(request,authcookie):
 
 
 if __name__ == "__main__":
-    socketio.run(app, host="0.0.0.0", port=8080, debug=True, allow_unsafe_werkzeug=True)
+    socketio.run(app, debug=True)
