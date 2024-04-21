@@ -1,4 +1,4 @@
-const socket = io.connect(`https://142.93.52.51:8080`, {transports: ['websocket']}); 
+const socket = io.connect(`https://localhost:8080`); 
 
 function submitPost() {
     const messageInput = document.getElementById('message');
