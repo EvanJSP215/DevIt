@@ -1,5 +1,5 @@
-const socket = io('https://tbd312.me', {transports: ['websocket', 'polling']});
-socket.connect();
+const socket = io.connect("https://tbd312.me", {transports: ["websocket"],});
+
 
 function submitPost() {
     const messageInput = document.getElementById('message');
