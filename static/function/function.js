@@ -1,4 +1,4 @@
-const socket = io.connect('wss://' + window.location.host + '/websocket'); 
+const socket = io.connect('https://localhost:8080');
 
 function submitPost() {
     const messageInput = document.getElementById('message');
