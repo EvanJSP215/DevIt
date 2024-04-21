@@ -1,4 +1,4 @@
-const socket = io.connect('https://tbd312.me'); 
+const socket = io.connect('wss://' + window.location.host + '/websocket'); 
 
 function submitPost() {
     const messageInput = document.getElementById('message');
