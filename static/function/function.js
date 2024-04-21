@@ -1,4 +1,5 @@
 const socket = io(); 
+socket.connect();
 
 function submitPost() {
     const messageInput = document.getElementById('message');
