@@ -326,16 +326,18 @@ def getBlogPage():
             haskAuthCookie = hashlib.sha256(authcookie.encode()).hexdigest()
             username = 'Guest'
             authUser = authtoken.find_one({'authtoken_hash' : haskAuthCookie})
+            Displayname = 'Guest'
             if authUser:
                 username = authUser['email']
+                Displayname = authUser['email']
                 check = UsernameStorage.find_one({'email' : username})
                 if check:
-                    username = check['username']
+                    Displayname = check['username']
                 picture = profile_picture.find_one({'email':username})
-                body = render_template('blog.html', UsernameReplace= username, image_url = "/static/images/default.png" , image_url2 = "/static/images/default.png")
+                body = render_template('blog.html', UsernameReplace= Displayname, image_url = "/static/images/default.png" , image_url2 = "/static/images/default.png")
                 if picture:
                     path = picture['path']
-                    body = render_template('blog.html', UsernameReplace= username, image_url = path, image_url2 = path)
+                    body = render_template('blog.html', UsernameReplace= Displayname, image_url = path, image_url2 = path)
                 response = make_response(body)
                 response.headers["Content-Type"] = "text/html"
                 return response 
