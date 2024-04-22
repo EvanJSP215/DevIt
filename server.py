@@ -157,7 +157,7 @@ def login():
             body = make_response(redirect(url_for('blogPage')))
             resp = make_response(body)
             resp.headers["Content-Type"] = "text/html"
-            resp.set_cookie('auth_token', token, httponly=True, max_age=3600)
+            resp.set_cookie('auth_token', token, httponly=True, max_age=3600, secure=True)
             return resp
         else:
             # Authentication failed
