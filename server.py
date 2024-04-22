@@ -25,6 +25,7 @@ auth = db['auth']
 authtoken = db['authtoken']
 chat = db['chat']
 id = db['chatid']
+UsernameStorage = db['usernames']
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 likes = db['likes']
 profile_picture = db['pic']
@@ -192,7 +193,9 @@ def chatm():
             check_profile = profile_picture.find_one({'email' : email})
             if check_profile:
                 ppicture = check_profile['path']
-
+            check = UsernameStorage.find_one({'email' : email})
+            if check:
+                email = check['username']
     for result in chatData:
         edit = 'False'
         like_count = likes.count_documents({'messageId': result['id']})
@@ -246,11 +249,12 @@ def update_username():
         hash_auth_cookie = hashlib.sha256(authcookie.encode()).hexdigest()
         auth_user = authtoken.find_one({'authtoken_hash': hash_auth_cookie})
         if auth_user:
+            user = auth_user['email']
             new_username = request.form.get('newUsername')
-            # Update the username for the logged-in user
-            authtoken.update_one({'email': auth_user['email']}, {'$set': {'email': new_username}})
-            
-            # Redirect to the blogPage with updated username
+            data = {'email':user, 'username':new_username}
+            check = UsernameStorage.find_one({'email' : user})
+            if check:
+                UsernameStorage.update_one({'email' : user},{'$set': data})
             response = make_response(redirect(url_for('blogPage')))
             return response
         else:
@@ -322,6 +326,9 @@ def getBlogPage():
             authUser = authtoken.find_one({'authtoken_hash' : haskAuthCookie})
             if authUser:
                 username = authUser['email']
+                check = UsernameStorage.find_one({'email' : username})
+                if check:
+                    username = check['username']
                 picture = profile_picture.find_one({'email':username})
                 body = render_template('blog.html', UsernameReplace= username, image_url = "/static/images/default.png" , image_url2 = "/static/images/default.png")
                 if picture:
@@ -500,11 +507,16 @@ def PostMessageHandler(request,authcookie):
         message = message.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
     else:
         message = "none"
+    Displayname = 'Guest'
     if authcookie != None:
         haskAuthCookie = hashlib.sha256(authcookie.encode()).hexdigest()
         authUser = authtoken.find_one({'authtoken_hash' : haskAuthCookie})
         if authUser:
             email = authUser['email']
+            Displayname = authUser['email']
+            check = UsernameStorage.find_one({'email' : email})
+            if check:
+                Displayname = check['username']
         else:
             # have the authcookie but authtoken does not exist
             email = 'Guest'
@@ -518,7 +530,7 @@ def PostMessageHandler(request,authcookie):
     check_profile = profile_picture.find_one({'email' : email})
     if check_profile:
         ppicture = check_profile['path']
-    return {'message': blogData['message'],'username':blogData['email'],'id':str(chatId),'likeCount' : blogData['likeCount'],'imagePath': imagePath,'profile_picture': ppicture, 'edit_permission': 'False'}
+    return {'message': blogData['message'],'username':Displayname,'id':str(chatId),'likeCount' : blogData['likeCount'],'imagePath': imagePath,'profile_picture': ppicture, 'edit_permission': 'False'}
 
 
 if __name__ == "__main__":
