@@ -365,8 +365,13 @@ def profile():
 @socketio.on('blogMessage')
 def handle_message(data):
     auth_token = request.cookies.get('auth_token', None)
+    user = 'Guest'
+    haskAuthCookie = hashlib.sha256(auth_token.encode()).hexdigest()
+    authUser = authtoken.find_one({'authtoken_hash' : haskAuthCookie})
+    if authUser:
+        user = authUser['email']
     message = PostMessageHandler(data,auth_token)
-    user = message.get('username',None)
+    
     if request.sid == user_lists.get(user,None):
         message['edit_permission'] = 'True'
         emit('NewMsg', message)
