@@ -255,6 +255,8 @@ def update_username():
             check = UsernameStorage.find_one({'email' : user})
             if check:
                 UsernameStorage.update_one({'email' : user},{'$set': data})
+            else:
+                UsernameStorage.insert_one(data)
             response = make_response(redirect(url_for('blogPage')))
             return response
         else:
