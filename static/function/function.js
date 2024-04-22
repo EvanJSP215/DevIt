@@ -1,13 +1,13 @@
 let socket = io.connect(`https://tbd312.me/`, {transports: ['websocket']});
 
 
+
 function submitPost() {
     const messageInput = document.getElementById('message');
     const imageInput = document.getElementById('image-upload');
 
     const message = messageInput.value;
     const imageFiles = imageInput.files;
-    console.log('Posted');
     if (imageFiles && imageFiles.length > 0) {
         const imageFile = imageFiles[0];
         const reader = new FileReader();
@@ -17,6 +17,7 @@ function submitPost() {
                 message: message,
                 image: imageData
             };
+            console.log(data);
             socket.emit('blogMessage',data);
         };
         reader.readAsDataURL(imageFile);
@@ -40,7 +41,6 @@ socket.on('NewMsg',function(data){
 });
 
 function addMessage(messageJSON) {
-    console.log(messageJSON);
     const chatMessages = document.getElementById("chatMessage");
     let messageHTML = `<div class='chat-message' id="Message_${messageJSON.id}">
                             <div class=".blog-picture-container">
@@ -90,7 +90,6 @@ socket.on('Like_Post',function(data){
         return;
     }
     Likebutton = document.getElementById('Likebutton_'+data.message_id);
-    console.log('Likebutton_'+data.message_id);
     Likebutton.innerHTML = '👍 '+data.likeCount;
     
 });

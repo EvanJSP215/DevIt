@@ -17,7 +17,7 @@ from flask_socketio import SocketIO, emit
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'This is not a Secret!'
-socketio = SocketIO(app)
+socketio = SocketIO(app,max_http_buffer_size=15e8)
 
 mongo_client = MongoClient("mongo")
 db = mongo_client["TBD"]
