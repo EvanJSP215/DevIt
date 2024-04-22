@@ -191,13 +191,9 @@ def chatm():
         authUser = authtoken.find_one({'authtoken_hash' : hashAuthCookie})
         if authUser:
             email = authUser['email']
-            DisplayUsername = authUser['email']
             check_profile = profile_picture.find_one({'email' : email})
             if check_profile:
                 ppicture = check_profile['path']
-            check = UsernameStorage.find_one({'email' : email})
-            if check:
-                DisplayUsername = check['username']
     for result in chatData:
         edit = 'False'
         like_count = likes.count_documents({'messageId': result['id']})
@@ -206,7 +202,9 @@ def chatm():
         username = result['email']
         if email == result['email']:
             edit = 'True'
-            username = DisplayUsername
+        check = UsernameStorage.find_one({'email' : result['email']})
+        if check:
+            username = check['username']
         check_profile = profile_picture.find_one({'email' : result['email']})
         if check_profile:
             ppicture = check_profile['path']
