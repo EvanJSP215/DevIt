@@ -12,7 +12,7 @@ import requests
 import json
 import magic
 from flask_socketio import SocketIO, emit
-from io import BytesIO
+
 
 
 app = Flask(__name__)
