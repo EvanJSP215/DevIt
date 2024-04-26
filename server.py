@@ -243,6 +243,7 @@ def update_username():
         if auth_user:
             user = auth_user['email']
             new_username = request.form.get('newUsername')
+            new_username = new_username.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
             data = {'email':user, 'username':new_username}
             check = UsernameStorage.find_one({'email' : user})
             if check:
