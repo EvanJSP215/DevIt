@@ -399,8 +399,8 @@ body {
     font-family: 'Manrope', sans-serif;
     font-size: 20px;
     line-height: 1; 
-    display: flex; /* Add display flex */
-    align-items: center; /* Center vertically */
+    display: flex; 
+    align-items: center; 
 }
 
 .profile-button:hover {
@@ -415,6 +415,7 @@ body {
     width: 250px; 
     height: 100%; 
     overflow-y: auto; 
+    margin-top: 15px;
 }
 
 .user-lists label {
@@ -432,29 +433,51 @@ body {
     text-align: left;
     
 }
- #online_users div {
-        margin-top: 10px;
-        margin-bottom: 10px;
-    }
+#online_users div {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
 
 .user-picture-container {
     display: flex;
+    flex-direction: column; 
     background-color: #f2f2f2;
     border-radius: 20px;
+    align-items: center; 
+    width: 100%; 
+    padding: 10px;
 }
 
 .user-circle {
-    margin-left: 10px;
-    width: 30px;
+    margin-right: 10px; 
+    width: 30px; 
     height: 30px;
     border-radius: 50%;
     overflow: hidden;
-    cursor: pointer;
-    margin-right: 10px; 
-    float: left;
 }
+
+
 
 .user-picture-container:hover {
     background: #005A8C; 
+}
+
+.username {
+    flex: 1; 
+    white-space: nowrap;
+    overflow:hidden;
+    text-overflow: ellipsis;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.Timer {
+    width: 100%;
+    text-align: center;
+    margin-top: 5px;
 }
 

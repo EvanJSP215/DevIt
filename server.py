@@ -243,6 +243,9 @@ def update_username():
         if auth_user:
             user = auth_user['email']
             new_username = request.form.get('newUsername')
+            if len(new_username) > 10:
+                response = make_response(redirect(url_for('blogPage')))
+                return response
             new_username = new_username.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
             data = {'email':user, 'username':new_username}
             check = UsernameStorage.find_one({'email' : user})
