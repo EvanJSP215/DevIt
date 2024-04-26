@@ -135,6 +135,9 @@ body {
     .post  {
         width: 550px;
     }
+    .chat-message {
+        width: 550px;
+    }
 }
 
 .post-input[type="text"] {
