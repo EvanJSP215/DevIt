@@ -1,5 +1,5 @@
-let socket = io.connect(`https://tbd312.me/`, {transports: ['websocket']});
-/*let socket = io();*/
+/*let socket = io.connect(`https://tbd312.me/`, {transports: ['websocket']});*/
+let socket = io();
 
 
 function submitPost() {
