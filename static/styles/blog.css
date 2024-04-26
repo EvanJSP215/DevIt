@@ -131,6 +131,12 @@ body {
     position: relative;
 }
 
+@media screen and (max-height: 720px) {
+    .post  {
+        width: 550px;
+    }
+}
+
 .post-input[type="text"] {
     width: 90%;
     padding-left: 7px;
@@ -148,7 +154,7 @@ body {
     border-right-width: 0px;
     border-left-style: solid;
     border-left-width: 0px;
-    height: 132px; width: 685px;
+    height: 132px; width: 535px;
     resize: none;
 }
 
