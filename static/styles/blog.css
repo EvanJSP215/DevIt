@@ -406,3 +406,55 @@ body {
 .profile-button:hover {
     background: #005A8C;
 }
+
+
+.user-lists{
+    position: fixed;
+    right: 10%; 
+    top: 30%; 
+    width: 200px; 
+    height: 100%; 
+    overflow-y: auto; 
+}
+
+.user-lists label {
+    font-family: 'Manrope', sans-serif; 
+    font-weight: bold; 
+    font-size: larger; 
+    text-align: center; 
+    display: block; 
+    width: 100%; 
+    margin: auto; 
+    line-height: 1.5;
+}
+
+#online_users {
+    text-align: left;
+    
+}
+ #online_users div {
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+.user-picture-container {
+    display: flex;
+    background-color: #f2f2f2;
+    border-radius: 20px;
+}
+
+.user-circle {
+    margin-left: 10px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+    margin-right: 10px; 
+    float: left;
+}
+
+.user-picture-container:hover {
+    background: #005A8C; 
+}
+

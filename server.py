@@ -12,7 +12,8 @@ import requests
 import json
 import magic
 from flask_socketio import SocketIO, emit
-
+from util.search_db import get_Profile_Picture,get_username,get_email
+import time
 
 
 app = Flask(__name__)
@@ -26,11 +27,13 @@ authtoken = db['authtoken']
 chat = db['chat']
 id = db['chatid']
 UsernameStorage = db['usernames']
+OnlineRTimer = db['OnlineTimer']
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 likes = db['likes']
 profile_picture = db['pic']
 tracker = db['track']
 user_lists = {}
+Lock = {}
 
 
 #add a nosniff after all responses
@@ -184,16 +187,7 @@ def chatm():
     chatData = chat.find({'status': 'Active'})
     arr =[]
     authcookie = request.cookies.get('auth_token',None)
-    email = 'None'
-    DisplayUsername = 'Guest'
-    if authcookie:
-        hashAuthCookie = hashlib.sha256(authcookie.encode()).hexdigest()
-        authUser = authtoken.find_one({'authtoken_hash' : hashAuthCookie})
-        if authUser:
-            email = authUser['email']
-            check_profile = profile_picture.find_one({'email' : email})
-            if check_profile:
-                ppicture = check_profile['path']
+    email = get_email(authcookie)      
     for result in chatData:
         edit = 'False'
         like_count = likes.count_documents({'messageId': result['id']})
@@ -202,12 +196,8 @@ def chatm():
         username = result['email']
         if email == result['email']:
             edit = 'True'
-        check = UsernameStorage.find_one({'email' : result['email']})
-        if check:
-            username = check['username']
-        check_profile = profile_picture.find_one({'email' : result['email']})
-        if check_profile:
-            ppicture = check_profile['path']
+        username = get_username(result['email'])
+        ppicture = get_Profile_Picture(result['email'])
         dic = {'message': result['message'], 'username': username, 'id': result['id'], 'likeCount' : result['likeCount'], 'edit_permission': edit, 'imagePath' : result['imagePath'], 'profile_picture': ppicture}
         arr.append(dic)
     jsonStr = json.dumps(arr)
@@ -368,12 +358,13 @@ def profile():
 def handle_message(data):
     auth_token = request.cookies.get('auth_token', None)
     user = 'Guest'
-    haskAuthCookie = hashlib.sha256(auth_token.encode()).hexdigest()
-    authUser = authtoken.find_one({'authtoken_hash' : haskAuthCookie})
-    if authUser:
-        user = authUser['email']
+    message = {}
+    if auth_token != None:
+        haskAuthCookie = hashlib.sha256(auth_token.encode()).hexdigest()
+        authUser = authtoken.find_one({'authtoken_hash' : haskAuthCookie})
+        if authUser:
+            user = authUser['email']
     message = PostMessageHandler(data,auth_token)
-    
     if request.sid == user_lists.get(user,None):
         message['edit_permission'] = 'True'
         emit('NewMsg', message)
@@ -382,27 +373,62 @@ def handle_message(data):
     message['edit_permission'] = 'False'
     emit('NewMsg', message, broadcast=True, include_self=False)
 
+@app.route("/user_list", methods=['GET'])
+def handle_user_list():
+    user_list = []
+    for user in user_lists.keys():
+        ppicture = get_Profile_Picture(user)
+        username = get_username(user)
+        message = {'username':username, 'ppicture':ppicture ,'email':user}
+        user_list.append(message)
+    jsonStr = json.dumps(user_list)
+    body = jsonStr
+    response = make_response(body)
+    response.headers["Content-Type"] = "application/json"
+    return response
+
 
 @socketio.on('connect')
 def handle_connect():
     auth_token = request.cookies.get('auth_token', None)
-    if auth_token != None:
-        haskAuthCookie = hashlib.sha256(auth_token.encode()).hexdigest()
-        authUser = authtoken.find_one({'authtoken_hash' : haskAuthCookie})
-        if authUser:
-            email = authUser['email']
-            user_lists[email] = request.sid
+    email = get_email(auth_token)
+    if email != 'None':
+        user_lists[email] = request.sid
+        ppicture = get_Profile_Picture(email)
+        username = get_username(email)
+        message = {'username':username, 'ppicture':ppicture ,'email':email}
+        emit('connect_user', message, broadcast=True)
+        socketio.start_background_task(updateTime, message)
+        
+def updateTime(message):
+    while message['email'] in Lock:
+        pass
+    while True:
+        Lock[message['email']] = 1
+        findUser = OnlineRTimer.find_one({'user': message['email']})
+        if findUser:
+            message['seconds'] = int(findUser['seconds']) + 1
+            OnlineRTimer.update_one({'user': message['username']},{'$set': {'seconds': int(findUser['seconds']) + 1}})
+        else:
+            OnlineRTimer.insert_one({'user': message['username'],'seconds':1})
+            message['seconds'] = 1
+        for users in user_lists.items():
+            socketio.emit('UpdateTimer', message, room=users )
+        time.sleep(1)
+        Lock.pop(message['email'])
 
 @socketio.on('disconnect')
 def handle_disconnect():
     auth_token = request.cookies.get('auth_token', None)
-    if auth_token != None:
-        haskAuthCookie = hashlib.sha256(auth_token.encode()).hexdigest()
-        authUser = authtoken.find_one({'authtoken_hash' : haskAuthCookie})
-        if authUser:
-            email = authUser['email']
+    email = get_email(auth_token)
+    if email != 'None':
+        if email in (user_lists):
             user_lists.pop(email)
+            OnlineRTimer.delete_one({'user': email})
+        message = {'email':email}
+        emit('disconnect_user', message, broadcast=True)
 
+        
 @socketio.on('Like_Post')
 def like_post(data):
     messageId = data.get('message_id')
@@ -537,10 +563,7 @@ def PostMessageHandler(request,authcookie):
         
     blogData = {'message': message, 'email': email, 'id': str(chatId), 'likeCount' : "0" , 'status': 'Active', 'imagePath': imagePath}
     chat.insert_one(blogData)
-    ppicture = '/static/images/default.png'
-    check_profile = profile_picture.find_one({'email' : email})
-    if check_profile:
-        ppicture = check_profile['path']
+    ppicture = get_Profile_Picture(email)
     return {'message': blogData['message'],'username':Displayname,'id':str(chatId),'likeCount' : blogData['likeCount'],'imagePath': imagePath,'profile_picture': ppicture, 'edit_permission': 'False'}
 
 

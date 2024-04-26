@@ -1,5 +1,5 @@
-let socket = io.connect(`https://tbd312.me/`, {transports: ['websocket']});
-
+/*let socket = io.connect(`https://tbd312.me/`, {transports: ['websocket']});*/
+let socket = io();
 
 
 function submitPost() {
@@ -35,6 +35,61 @@ function submitPost() {
     imageInput.value = '';
 }
 
+
+
+
+socket.on('connect_user',function(data){
+    user = document.getElementById('userlist_'+data.email);
+    if(user){
+        user.remove();
+    }
+    addUser(data);
+});
+
+
+socket.on('UpdateTimer', function(data) {
+    var Timer = document.getElementById('Time_' + data.email);
+    var seconds = parseInt(data.seconds, 10);
+
+    var hours = Math.floor(seconds / 3600);
+    seconds = (seconds - (hours * 3600))
+    var minutes = Math.floor(seconds / 60);
+    seconds = (seconds - (minutes * 60))
+
+    if (seconds < 10){
+        seconds = "0"+String(seconds);
+    }
+    if (hours < 10){
+        hours = "0"+String(hours);
+    }
+    if (minutes < 10){
+        minutes = "0"+String(minutes);
+    }
+    Timer.innerHTML = `${hours}:${minutes}:${seconds}`;
+});
+
+
+function addUser(data){
+    const userlist = document.getElementById('online_users');
+    let user = `<div class="user-picture-container" id=userlist_${data.email}>
+                    <div class="user-info">
+                        <div class="user-circle" id="blog-circle">
+                            <img src=${data.ppicture}  alt="Profile Picture" >
+                        </div>
+                        <div class='username'>${data.username}</div>
+                        <div id=Time_${data.email} class='Timer'>0 second</div>
+                    </div>
+                 </div>`;
+    userlist.innerHTML += user;
+}
+
+socket.on('disconnect_user',function(data){
+    user = document.getElementById('userlist_'+data.email);
+    if(user){
+        user.remove();
+    }
+
+});
 
 socket.on('NewMsg',function(data){
     addMessage(data);
@@ -97,6 +152,13 @@ socket.on('Like_Post',function(data){
 function clearChat() {
     const chatMessages = document.getElementById("chatMessage");
     chatMessages.innerHTML = "";
+}
+
+function clearUserList(){
+    const userlist = document.getElementById("online_users");
+    if (userlist){
+        userlist.innerHTML = "";
+    }
 }
 
 function deleteMessage(messageId){
@@ -173,8 +235,24 @@ function chatRequest(){
     request.send();
 }
 
-chatRequest();
+function userRequest(){
+    const request = new XMLHttpRequest();
+    request.onreadystatechange = function () {
+        if (this.readyState === 4 && this.status === 200) {
+            const messages = JSON.parse(this.response);
+            console.log(messages);
+            clearUserList();
+            for (const message of messages) {
+                addUser(message);
+            }
+        }
+    }
+    request.open("GET", "/user_list"); 
+    request.send();
+}
 
+chatRequest();
+userRequest();
 
 
 
