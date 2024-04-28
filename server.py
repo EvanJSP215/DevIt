@@ -30,6 +30,7 @@ chat = db['chat']
 id = db['chatid']
 UsernameStorage = db['usernames']
 OnlineRTimer = db['OnlineTimer']
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 likes = db['likes']
 profile_picture = db['pic']
 tracker = db['track']
@@ -39,7 +40,7 @@ Lock = {}
 
 limiter = Limiter(
     app,
-    key_func=get_remote_address,
+    
     default_limits=["50 per 10 seconds"]
 )
 
