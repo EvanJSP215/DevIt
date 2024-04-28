@@ -13,6 +13,9 @@ import json
 import magic
 from flask_socketio import SocketIO, emit
 from util.search_db import get_Profile_Picture,get_username,get_email
+from flask import Flask, request, abort
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 import time
 
 
@@ -32,9 +35,34 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 likes = db['likes']
 profile_picture = db['pic']
 tracker = db['track']
+banned_ip = db['banIP']
 user_lists = {}
 Lock = {}
 
+limiter = Limiter(
+    app,
+    key_func=get_remote_address,
+    default_limits=["50 per 10 seconds"]
+)
+
+@app.before_request
+@limiter.limit("50 per 10 seconds")
+def global_rate_limit():
+    ip_address = request.headers.get('X-Real-IP')
+    check_Ban = banned_ip.find_one({'ip': ip_address})
+    if check_Ban:
+        if check_Ban['time'] > time.time():
+            abort(429)
+        else:
+            del banned_ip.delete_one({'ip': ip_address})
+    if limiter.hit():
+        banUser = {'ip': ip_address, 'time': time.time() + 30}
+        banned_ip.insert_one(banUser)
+        abort(429)
+
+@app.errorhandler(429)
+def rate_limit_exceeded(error):
+    return "Rate limit exceeded. Please try again later.", 429
 
 #add a nosniff after all responses
 @app.after_request
