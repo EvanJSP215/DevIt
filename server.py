@@ -40,7 +40,7 @@ Lock = {}
 
 limiter = Limiter(
     app,
-    
+    key_func=get_remote_address,
     default_limits=["50 per 10 seconds"]
 )
 
@@ -61,6 +61,10 @@ def global_rate_limit():
 
 @app.errorhandler(429)
 def rate_limit_exceeded(error):
+    ip_address = request.headers.get('X-Real-IP', request.remote_addr)
+    if 'rate limit exceeded' in str(error):
+        ban_user = {'ip': ip_address, 'time': time.time() + 30}  
+        banned_ip.insert_one(ban_user)
     return "Rate limit exceeded. Please try again later.", 429
 
 #add a nosniff after all responses
