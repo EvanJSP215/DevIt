@@ -13,8 +13,6 @@ import json
 import magic
 from flask_socketio import SocketIO, emit
 from util.search_db import get_Profile_Picture,get_username,get_email
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 import time
 
 
@@ -34,39 +32,47 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 likes = db['likes']
 profile_picture = db['pic']
 tracker = db['track']
-banned_ip = db['banIP']
+banned_ips = db["banned_ips"]
+req_counts = db["request_counts"]
 user_lists = {}
 Lock = {}
 
 
-
-def custom_key_func():
-    return request.headers.get('X-Real-IP')
-
-limiter = Limiter(
-    app,
-    key_func=custom_key_func,
-    default_limits=["50 per 10 seconds"]
-)
+RATE_LIMIT = 50  # maximum number of requests
+TIME_PERIOD = 10  # time period in seconds
 
 @app.before_request
-@limiter.limit("50 per 10 seconds")
-def global_rate_limit():
+def check_rate_limit():
     ip_address = request.headers.get('X-Real-IP')
-    check_Ban = banned_ip.find_one({'ip': ip_address})
-    if check_Ban:
-        if check_Ban['time'] > time.time():
-            abort(429)
+    
+    # Check if the IP is banned
+    current_time = time.time()
+    ban_record = banned_ips.find_one({'ip': ip_address})
+    if ban_record and ban_record['time'] > current_time:
+        abort(429, "Rate limit exceeded. Please try again later.")
+
+    # Check rate limits
+    record = req_counts.find_one({'ip': ip_address})
+    if record:
+        time_passed = current_time - record['first_request_time']
+        if time_passed < TIME_PERIOD:
+            if record['count'] >= RATE_LIMIT:
+                # Ban the IP if it exceeds the limit
+                banned_ips.update_one({'ip': ip_address}, {'$set': {'time': current_time + 30}}, upsert=True)
+                abort(429, "Rate limit exceeded. Please try again later.")
+            else:
+                # Increment the count
+                req_counts.update_one({'ip': ip_address}, {'$inc': {'count': 1}})
         else:
-            banned_ip.delete_one({'ip': ip_address})
+            # Reset count and time
+            req_counts.update_one({'ip': ip_address}, {'$set': {'count': 1, 'first_request_time': current_time}})
+    else:
+        # Create new record
+        req_counts.insert_one({'ip': ip_address, 'count': 1, 'first_request_time': current_time})
 
 @app.errorhandler(429)
-def rate_limit_exceeded(error):
-    ip_address = request.headers.get('X-Real-IP', request.remote_addr)
-    if 'rate limit exceeded' in str(error):
-        ban_user = {'ip': ip_address, 'time': time.time() + 30}  
-        banned_ip.insert_one(ban_user)
-    return "Rate limit exceeded. Please try again later.", 429
+def rate_limit_exceeded(e):
+    return str(e), 429
 
 #add a nosniff after all responses
 @app.after_request
