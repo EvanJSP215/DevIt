@@ -38,9 +38,14 @@ banned_ip = db['banIP']
 user_lists = {}
 Lock = {}
 
+
+
+def custom_key_func():
+    return request.headers.get('X-Real-IP', request.remote_addr)
+
 limiter = Limiter(
     app,
-    key_func=get_remote_address,
+    key_func=custom_key_func,
     default_limits=["50 per 10 seconds"]
 )
 
@@ -54,10 +59,6 @@ def global_rate_limit():
             abort(429)
         else:
             banned_ip.delete_one({'ip': ip_address})
-    if limiter.should_limit():
-        banUser = {'ip': ip_address, 'time': time.time() + 30}
-        banned_ip.insert_one(banUser)
-        abort(429)
 
 @app.errorhandler(429)
 def rate_limit_exceeded(error):
