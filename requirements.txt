@@ -5,3 +5,4 @@ flask
 Flask-WTF
 python-magic
 flask-socketio
+flask-limiter
