@@ -41,7 +41,7 @@ Lock = {}
 
 
 def custom_key_func():
-    return request.headers.get('X-Real-IP', request.remote_addr)
+    return request.headers.get('X-Real-IP')
 
 limiter = Limiter(
     app,
