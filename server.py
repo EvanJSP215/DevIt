@@ -49,7 +49,7 @@ def check_rate_limit():
     current_time = time.time()
     ban_record = banned_ips.find_one({'ip': ip_address})
     if ban_record and ban_record['time'] > current_time:
-        abort(429, "Rate limit exceeded. Please try again later.")
+        abort(429, "Rate limit exceeded. Please try again after 30.")
 
     # Check rate limits
     record = req_counts.find_one({'ip': ip_address})
@@ -61,7 +61,6 @@ def check_rate_limit():
                 banned_ips.update_one({'ip': ip_address}, {'$set': {'time': current_time + 30}}, upsert=True)
                 abort(429, "Rate limit exceeded. Please try again later.")
             else:
-                # Increment the count
                 req_counts.update_one({'ip': ip_address}, {'$inc': {'count': 1}})
         else:
             # Reset count and time
@@ -71,8 +70,8 @@ def check_rate_limit():
         req_counts.insert_one({'ip': ip_address, 'count': 1, 'first_request_time': current_time})
 
 @app.errorhandler(429)
-def rate_limit_exceeded(e):
-    return str(e), 429
+def rate_limit_exceeded(error):
+    return str(error), 429
 
 #add a nosniff after all responses
 @app.after_request
