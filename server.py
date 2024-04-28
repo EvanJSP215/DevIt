@@ -54,7 +54,7 @@ def global_rate_limit():
             abort(429)
         else:
             banned_ip.delete_one({'ip': ip_address})
-    if limiter.hit():
+    if limiter.should_limit():
         banUser = {'ip': ip_address, 'time': time.time() + 30}
         banned_ip.insert_one(banUser)
         abort(429)
