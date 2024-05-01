@@ -9,9 +9,14 @@ function submitPost() {
     const imageFiles = imageInput.files;
     if (message.length > 2000) {
         alert("Maximum characters allowed are 2000.");
+        return;
     }
     if (imageFiles && imageFiles.length > 0) {
         const imageFile = imageFiles[0];
+        if ((imageFile.size/ 1024 / 1024) > 3){
+            alert("Maximum file Upload size is 3MB");
+            return;
+        }
         const reader = new FileReader();
         reader.onload = function(event) {
             const imageData = event.target.result;

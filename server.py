@@ -319,6 +319,9 @@ def upload():
                 return str(request.files) + ':'+str(request), 400
 
             file = request.files['file-upload']
+            if file:
+                if file > 3 * 1048576:
+                    return "Maximum size for an image is 3MB.", 413
             #determine the file type
             determine = magic.Magic(mime=True)
             type = determine.from_buffer(file.read(1024))
@@ -549,9 +552,12 @@ def PostMessageHandler(request,authcookie):
     message = request.get("message",None)
     if message:
         if len(message)>2000:
-            pass
-    
+            return
+
     imageFile = request.get("image",None)
+    if imageFile:
+        if imageFile.content_length > 3 * 1048576:
+            return "Maximum size for an image is 3MB.", 413
     uid = id.find_one({})
     chatId = '0'
     if uid:
