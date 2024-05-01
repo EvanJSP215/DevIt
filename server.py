@@ -547,6 +547,10 @@ def updatemsg(data):
 
 def PostMessageHandler(request,authcookie):
     message = request.get("message",None)
+    if message:
+        if len(message)>2000:
+            pass
+    
     imageFile = request.get("image",None)
     uid = id.find_one({})
     chatId = '0'

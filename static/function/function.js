@@ -5,9 +5,11 @@ let socket = io();
 function submitPost() {
     const messageInput = document.getElementById('message');
     const imageInput = document.getElementById('image-upload');
-
     const message = messageInput.value;
     const imageFiles = imageInput.files;
+    if (message.length > 2000) {
+        alert("Maximum characters allowed are 2000.");
+    }
     if (imageFiles && imageFiles.length > 0) {
         const imageFile = imageFiles[0];
         const reader = new FileReader();
