@@ -319,10 +319,11 @@ def upload():
                 return str(request.files) + ':'+str(request), 400
 
             file = request.files.get('file-upload', None)
-            print(file.content_length)
-            if file.content_length > 3 * 1048576:
-                return "Maximum size for an image is 3MB.", 400
-                
+            file.seek(0, os.SEEK_END)  # Move cursor to the end of the file
+            file_size = file.tell()
+            file.seek(0)
+            if file_size > 3 * 1048576:
+                return 'MAX IMAGE SIZE is 3MB', 400
             #determine the file type
             determine = magic.Magic(mime=True)
             type = determine.from_buffer(file.read(1024))
