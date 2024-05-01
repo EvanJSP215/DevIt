@@ -417,7 +417,7 @@ def handle_message(data):
 @app.route("/user_list", methods=['GET'])
 def handle_user_list():
     user_list = []
-    for user in user_lists.keys():
+    for user in list(user_lists.keys()):
         ppicture = get_Profile_Picture(user)
         username = get_username(user)
         message = {'username':username, 'ppicture':ppicture ,'email':user}
