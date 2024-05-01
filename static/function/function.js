@@ -49,29 +49,31 @@ socket.on('connect_user',function(data){
 
 socket.on('UpdateTimer', function(data) {
     var Timer = document.getElementById('Time_' + data.email);
-    var seconds = parseInt(data.seconds, 10);
+    if (Timer){
+        var seconds = parseInt(data.seconds, 10);
+        var hours = Math.floor(seconds / 3600);
+        seconds = (seconds - (hours * 3600))
+        var minutes = Math.floor(seconds / 60);
+        seconds = (seconds - (minutes * 60))
 
-    var hours = Math.floor(seconds / 3600);
-    seconds = (seconds - (hours * 3600))
-    var minutes = Math.floor(seconds / 60);
-    seconds = (seconds - (minutes * 60))
-
-    if (seconds < 10){
-        seconds = "0"+String(seconds);
+        if (seconds < 10){
+            seconds = "0"+String(seconds);
+        }
+        if (hours < 10){
+            hours = "0"+String(hours);
+        }
+        if (minutes < 10){
+            minutes = "0"+String(minutes);
+        }
+        Timer.innerHTML = `${hours}:${minutes}:${seconds}`;
     }
-    if (hours < 10){
-        hours = "0"+String(hours);
-    }
-    if (minutes < 10){
-        minutes = "0"+String(minutes);
-    }
-    Timer.innerHTML = `${hours}:${minutes}:${seconds}`;
 });
 
 
 function addUser(data){
     const userlist = document.getElementById('online_users');
-    let user = `<div class="user-picture-container" id=userlist_${data.email}>
+    if (userlist){
+        let user = `<div class="user-picture-container" id=userlist_${data.email}>
                     <div class="user-info">
                         <div class="user-circle" id="blog-circle">
                             <img src=${data.ppicture}  alt="Profile Picture" >
@@ -80,7 +82,8 @@ function addUser(data){
                         <div id=Time_${data.email} class='Timer'>0 second</div>
                     </div>
                  </div>`;
-    userlist.innerHTML += user;
+        userlist.innerHTML += user;
+    }
 }
 
 socket.on('disconnect_user',function(data){
