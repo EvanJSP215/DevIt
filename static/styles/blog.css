@@ -488,3 +488,21 @@ body {
     margin-top: 5px;
 }
 
+body.dark-mode {
+    background: #333;
+}
+
+.head-container.dark-mode {
+    background-color: #222; /* Dark mode background color for head-container */
+    
+}
+
+.user-info-container.dark-mode {
+    background-color: #222;
+    border-left-color: #333;
+}
+
+.chat-message.dark-mode {
+    background-color: #222;
+    border-color: #333;
+}

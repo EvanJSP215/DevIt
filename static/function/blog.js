@@ -13,6 +13,18 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 
+function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+}
+document.addEventListener("DOMContentLoaded", function() {
+    const toggleModeBtn = document.getElementById('toggle-mode-btn');
+
+    toggleModeBtn.addEventListener('click', function() {
+        document.body.classList.toggle('dark-mode');
+    });
+});
+
+
 
 function submitForm() {
     document.getElementById("image-form").submit();
