@@ -506,3 +506,20 @@ body.dark-mode {
     background-color: #222;
     border-color: #333;
 }
+
+
+.togglebutton {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    position: absolute;
+    top: 1%;
+    left: 50%;
+}
+
+.togglebutton:hover {
+    background-color: #0056b3;
+}
