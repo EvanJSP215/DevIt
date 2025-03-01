@@ -1,15 +1,20 @@
-# Zero
+# DevIt
+Welcome to **DevIt**!
 
-Project Part 3: Toggle Dark Mode Feature
-This new feature allows an authenticated user to toggle the background of the blog page to either a light or dark background. This has not been a part of any homework or project objective or a subset of any requirement thus far.
+This is a Web Development Project created in CSE312: Web Development to apply the concepts about web development into a final Project.
 
-Testing Procedure:
-Run docker compose up
-Go to localhost:8080
-Register a new Account and Log in.
-After verifying that the log in process works, make sure the signed in user is on the blog page.
-Click on the Toggle Mode Button to either light or dark background.
-If the background has changed colors, then the toggle mode button works and the feature works as described.
+## About DevIt
+DevIt is a Social Media Web Application based off of Reddit and Twitter. DevIt seeks to be the central place where developers can post ideas, thoughts, etc all in one place!
 
-Deployed Website
-(https://tbd312.me/)
+## How to Run it Locally
+- Testing Procedure:
+ - Run docker compose up
+ - Go to localhost:8080
+ - Register a new Account and Log in.
+ - After verifying that the log in process works, make sure the signed in user is on the blog page.
+ - Once Signed-in, feel free to post anything to test it out.
+
+## Additional Notes
+The Frontend of DevIt is a work in progress amid a rebrand as the main goal was to focus more on the backend of our web application!
+
+
