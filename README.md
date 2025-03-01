@@ -3,6 +3,8 @@ Welcome to **DevIt**!
 
 This is a Web Development Project created in CSE312: Web Development to apply the concepts about web development into a final Project.
 
+(Disclaimer: Backend Code has been removed for Security Reasons)
+
 ## About DevIt
 DevIt is a Social Media Web Application based off of Reddit and Twitter. DevIt seeks to be the central place where developers can post ideas, thoughts, etc all in one place!
 
